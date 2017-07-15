@@ -1,7 +1,7 @@
 ﻿#if EF_CORE
-namespace EntityFrameworkCore.ChangeTrackingExtensions.Entities
+namespace EntityFrameworkCore.ChangeTrackingExtensions
 #else
-namespace EntityFramework.ChangeTrackingExtensions.Entities
+namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {
     /// <summary>

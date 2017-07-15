@@ -1,11 +1,15 @@
-﻿using System;
+﻿#if EF_CORE
+using System;
 using System.Diagnostics;
 using Jil;
 
-#if EF_CORE
-namespace EntityFrameworkCore.ChangeTrackingExtensions.Entities
+namespace EntityFrameworkCore.ChangeTrackingExtensions
 #else
-namespace EntityFramework.ChangeTrackingExtensions.Entities
+using System;
+using System.Diagnostics;
+using Jil;
+
+namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {
     /// <summary>

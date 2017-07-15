@@ -1,9 +1,11 @@
-﻿using System;
+﻿#if EF_CORE
+using System;
 
-#if EF_CORE
-namespace EntityFrameworkCore.ChangeTrackingExtensions.Entities
+namespace EntityFrameworkCore.ChangeTrackingExtensions
 #else
-namespace EntityFramework.ChangeTrackingExtensions.Entities
+using System;
+
+namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {
     /// <summary>

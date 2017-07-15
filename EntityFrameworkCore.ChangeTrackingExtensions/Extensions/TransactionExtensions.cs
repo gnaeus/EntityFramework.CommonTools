@@ -1,17 +1,18 @@
-﻿using System;
+﻿#if EF_CORE
+using System;
 using System.Threading.Tasks;
-
-#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.ChangeTrackingExtensions.Extensions
+namespace EntityFrameworkCore.ChangeTrackingExtensions
 #else
+using System;
+using System.Threading.Tasks;
 using System.Data.Entity;
 
-namespace EntityFramework.ChangeTrackingExtensions.Extensions
+namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {
-    internal static class TransactionExtensions
+    public static partial class DbContextExtensions
     {
         /// <summary>
         /// Execute <paramref name="method"/> in existing transaction or create and use new transaction.

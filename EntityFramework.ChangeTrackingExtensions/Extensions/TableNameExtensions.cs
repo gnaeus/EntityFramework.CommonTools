@@ -7,11 +7,10 @@ using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Core.Mapping;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
-using EntityFramework.ChangeTrackingExtensions.Utils;
 
-namespace EntityFramework.ChangeTrackingExtensions.Extensions
+namespace EntityFramework.ChangeTrackingExtensions
 {
-    public static class TableNameExtensions
+    public static partial class DbContextExtensions
     {
         /// <summary>
         /// Get corresponding table name and schema by <paramref name="entityType"/>
