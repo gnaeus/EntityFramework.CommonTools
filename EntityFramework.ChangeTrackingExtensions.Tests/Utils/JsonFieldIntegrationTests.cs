@@ -10,25 +10,25 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         {
             using (var context = new TestDbContext(_connection))
             {
-                var element = new SettingsElement
+                var settings = new Settings
                 {
                     Key = "first",
                     Value = new { Number = 123, String = "test" },
                 };
                 
-                context.Settings.Add(element);
+                context.Settings.Add(settings);
 
                 context.SaveChanges();
             }
 
             using (var context = new TestDbContext(_connection))
             {
-                var element = context.Settings.Find("first");
+                var settings = context.Settings.Find("first");
 
-                Assert.IsNotNull(element);
-                Assert.IsNotNull(element.Value);
-                Assert.AreEqual(123, (int)element.Value.Number);
-                Assert.AreEqual("test", (string)element.Value.String);
+                Assert.IsNotNull(settings);
+                Assert.IsNotNull(settings.Value);
+                Assert.AreEqual(123, (int)settings.Value.Number);
+                Assert.AreEqual("test", (string)settings.Value.String);
             }
         }
     }

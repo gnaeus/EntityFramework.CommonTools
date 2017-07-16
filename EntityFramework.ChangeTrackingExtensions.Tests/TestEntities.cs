@@ -55,7 +55,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
     }
 
     [Table("Settings")]
-    public class SettingsElement : IFullAuditable, IConcurrencyCheckable
+    public class Settings : IFullAuditable, IConcurrencyCheckable
     {
         [Key]
         public string Key { get; set; }
