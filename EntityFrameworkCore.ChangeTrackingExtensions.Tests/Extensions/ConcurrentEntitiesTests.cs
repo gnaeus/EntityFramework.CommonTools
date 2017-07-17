@@ -17,6 +17,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
     [TestClass]
     public partial class ConcurrentEntitiesTests : TestInitializer
     {
+        // TODO: delete IConcurrencyCheckable entity (but not ISoftDeletable)
+
         [TestMethod, ExpectedException(typeof(DbUpdateConcurrencyException))]
         public void TestConcurrencyCheckableGuidEntities()
         {
