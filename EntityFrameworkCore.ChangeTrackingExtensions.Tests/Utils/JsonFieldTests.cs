@@ -1,9 +1,16 @@
-﻿using System.Collections.Generic;
+﻿#if EF_CORE
+using System.Collections.Generic;
 using System.Linq;
-using EntityFramework.ChangeTrackingExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EntityFramework.Common.Tests
+namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
+#else
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace EntityFramework.ChangeTrackingExtensions.Tests
+#endif
 {
     [TestClass]
     public class JsonFieldTests
@@ -128,8 +135,11 @@ namespace EntityFramework.Common.Tests
             var user = new User();
 
             user.Address = new Address { City = "Moscow", Street = "Arbat" };
-
+#if EF_CORE
+            Assert.AreEqual("{\"Street\":\"Arbat\",\"City\":\"Moscow\"}", user.AddressJson);
+#else
             Assert.AreEqual("{\"City\":\"Moscow\",\"Street\":\"Arbat\"}", user.AddressJson);
+#endif
         }
 
         [TestMethod]
@@ -155,8 +165,11 @@ namespace EntityFramework.Common.Tests
             {
                 new Phone { Code = "123", Number = "456789" },
             };
-
+#if EF_CORE
+            Assert.AreEqual("[{\"Code\":\"123\",\"Number\":\"456789\"}]", user.PhonesJson);
+#else
             Assert.AreEqual("[{\"Number\":\"456789\",\"Code\":\"123\"}]", user.PhonesJson);
+#endif
         }
 
         [TestMethod]
@@ -238,9 +251,11 @@ namespace EntityFramework.Common.Tests
         public void ShouldUseEqualJsonWhenPropertyNotChanged()
         {
             var user = new User();
-
+#if EF_CORE
+            user.AddressJson = "{\"Street\":\"Arbat\",\"City\":\"Moscow\"}";
+#else
             user.AddressJson = "{\"City\":\"Moscow\",\"Street\":\"Arbat\"}";
-
+#endif
             string addressJson = user.AddressJson;
 
             var address = user.Address;
@@ -258,8 +273,11 @@ namespace EntityFramework.Common.Tests
             user.Address.Street = "Tverskaya";
 
             string addressJson = user.AddressJson;
-
+#if EF_CORE
+            Assert.AreEqual("{\"Street\":\"Tverskaya\",\"City\":\"Moscow\"}", user.AddressJson);
+#else
             Assert.AreEqual("{\"City\":\"Moscow\",\"Street\":\"Tverskaya\"}", user.AddressJson);
+#endif
         }
 
         [TestMethod]
@@ -284,9 +302,13 @@ namespace EntityFramework.Common.Tests
 
             var address = user.Address;
             var phones = user.Phones;
-
+#if EF_CORE
+            Assert.AreEqual("{\"Street\":\"Arbat\",\"City\":null}", user.AddressJson);
+            Assert.AreEqual("[{\"Code\":null,\"Number\":\"456789\"},{\"Code\":null,\"Number\":null}]", user.PhonesJson);
+#else
             Assert.AreEqual("{\"City\":null,\"Street\":\"Arbat\"}", user.AddressJson);
             Assert.AreEqual("[{\"Number\":\"456789\",\"Code\":null},{\"Number\":null,\"Code\":null}]", user.PhonesJson);
+#endif
         }
 
         class Settings

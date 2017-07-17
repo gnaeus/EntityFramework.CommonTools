@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore.ChangeT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.ChangeTrackingExtensions.Tests", "EntityFramework.ChangeTrackingExtensions.Tests\EntityFramework.ChangeTrackingExtensions.Tests.csproj", "{B0EB94E6-C524-472F-B276-C8B992BB5092}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFrameworkCore.ChangeTrackingExtensions.Tests", "EntityFrameworkCore.ChangeTrackingExtensions.Tests\EntityFrameworkCore.ChangeTrackingExtensions.Tests.csproj", "{3496C87F-E595-44F3-AB3C-E678A38DA950}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B0EB94E6-C524-472F-B276-C8B992BB5092}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0EB94E6-C524-472F-B276-C8B992BB5092}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0EB94E6-C524-472F-B276-C8B992BB5092}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
