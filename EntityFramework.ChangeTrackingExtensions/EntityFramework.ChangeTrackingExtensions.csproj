@@ -52,6 +52,7 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ChangeTrackingExtensions.cs" />
     <Compile Include="Extensions\TableNameExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions\Entities\**\*.cs">

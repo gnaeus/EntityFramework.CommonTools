@@ -1,7 +1,7 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EntityFramework.ChangeTrackingExtensions.Tests
@@ -19,24 +19,73 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             Database.SetInitializer<TestDbContext>(null);
         }
 
-        // TODO: what about ChangeTracker.DetectChanges() ?
         public override int SaveChanges()
         {
-            bool autoDetectChangesEnabled = Configuration.AutoDetectChangesEnabled;
-            Configuration.AutoDetectChangesEnabled = false;
-            try
+            using (this.WithChangeTrackingOnce())
             {
-                ChangeTracker.DetectChanges();
-
                 this.UpdateTrackableEntities();
-
                 this.UpdateConcurrentEntities();
 
                 return this.SaveChangesWithTransactionLog(base.SaveChanges);
             }
-            finally
+        }
+
+        public int SaveChanges(int editorUserId)
+        {
+            using (this.WithChangeTrackingOnce())
             {
-                Configuration.AutoDetectChangesEnabled = autoDetectChangesEnabled;
+                this.UpdateAuditableEntities(editorUserId);
+                // this.UpdateTrackableEntities();
+                this.UpdateConcurrentEntities();
+
+                return this.SaveChangesWithTransactionLog(base.SaveChanges);
+            }
+        }
+
+        public int SaveChanges(string editorUser)
+        {
+            using (this.WithChangeTrackingOnce())
+            {
+                this.UpdateAuditableEntities(editorUser);
+                // this.UpdateTrackableEntities();
+                this.UpdateConcurrentEntities();
+
+                return this.SaveChangesWithTransactionLog(base.SaveChanges);
+            }
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            using (this.WithChangeTrackingOnce())
+            {
+                this.UpdateTrackableEntities();
+                this.UpdateConcurrentEntities();
+
+                return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync, cancellationToken);
+            }
+        }
+
+        public Task<int> SaveChangesAsync(int editorUserId)
+        {
+            using (this.WithChangeTrackingOnce())
+            {
+                this.UpdateAuditableEntities(editorUserId);
+                // this.UpdateTrackableEntities();
+                this.UpdateConcurrentEntities();
+
+                return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync);
+            }
+        }
+
+        public Task<int> SaveChangesAsync(string editorUser)
+        {
+            using (this.WithChangeTrackingOnce())
+            {
+                this.UpdateAuditableEntities(editorUser);
+                // this.UpdateTrackableEntities();
+                this.UpdateConcurrentEntities();
+
+                return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync);
             }
         }
 
