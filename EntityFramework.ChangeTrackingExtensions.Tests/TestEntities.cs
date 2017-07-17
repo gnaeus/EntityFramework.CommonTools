@@ -19,7 +19,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         public DateTime? DeletedUtc { get; set; }
     }
     
-    public class Post : IFullAuditable<int>, IConcurrencyCheckable, ITransactionLoggable
+    public class Post : IFullAuditable<int>, IConcurrencyCheckable<Guid>, ITransactionLoggable
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -47,15 +47,14 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         public DateTime? DeletedUtc { get; set; }
 
         [ConcurrencyCheck]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public long RowVersion { get; set; }
+        public Guid RowVersion { get; set; }
 
         [ForeignKey(nameof(CreatorUserId))]
         public virtual User Author { get; set; }
     }
 
     [Table("Settings")]
-    public class Settings : IFullAuditable, IConcurrencyCheckable
+    public class Settings : IFullAuditable, IConcurrencyCheckable<long>
     {
         [Key]
         public string Key { get; set; }

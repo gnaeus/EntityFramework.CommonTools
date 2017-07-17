@@ -39,20 +39,28 @@ namespace EntityFramework.ChangeTrackingExtensions
             {
                 object entity = dbEntry.Entity;
 
-                if ((dbEntry.State & (EntityState.Modified | EntityState.Deleted)) != 0)
+                var concurrencyCheckableTimestamp = entity as IConcurrencyCheckable<byte[]>;
+                if (concurrencyCheckableTimestamp != null)
                 {
-                    var concurrencyCheckable = entity as IConcurrencyCheckable;
-                    if (concurrencyCheckable != null)
-                    {
-                        // take row version from entity that modified by client
-                        dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckable.RowVersion;
-                    }
-                    var timestampCheckable = entity as ITimestampCheckable;
-                    if (timestampCheckable != null)
-                    {
-                        // take row version from entity that modified by client
-                        dbEntry.Property("RowVersion").OriginalValue = timestampCheckable.RowVersion;
-                    }
+                    // take row version from entity that modified by client
+                    dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckableTimestamp.RowVersion;
+                    continue;
+                }
+                var concurrencyCheckableLong = entity as IConcurrencyCheckable<long>;
+                if (concurrencyCheckableLong != null)
+                {
+                    // take row version from entity that modified by client
+                    dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckableLong.RowVersion;
+                    continue;
+                }
+                var concurrencyCheckableGuid = entity as IConcurrencyCheckable<Guid>;
+                if (concurrencyCheckableGuid != null)
+                {
+                    // take row version from entity that modified by client
+                    dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckableGuid.RowVersion;
+                    // generate new row version
+                    concurrencyCheckableGuid.RowVersion = Guid.NewGuid();
+                    continue;
                 }
             }
         }
@@ -79,10 +87,10 @@ namespace EntityFramework.ChangeTrackingExtensions
                         throw;
                     }
                     // update original values from the database 
-                    EntityEntry entry = ex.Entries.Single();
-                    entry.OriginalValues.SetValues(entry.GetDatabaseValues());
+                    EntityEntry dbEntry = ex.Entries.Single();
+                    dbEntry.OriginalValues.SetValues(dbEntry.GetDatabaseValues());
 
-                    UpdateRowVersionFromDb(entry);
+                    UpdateRowVersionFromDb(dbEntry);
                 }
             };
         }
@@ -109,25 +117,35 @@ namespace EntityFramework.ChangeTrackingExtensions
                         throw;
                     }
                     // update original values from the database 
-                    EntityEntry entry = ex.Entries.Single();
-                    entry.OriginalValues.SetValues(await entry.GetDatabaseValuesAsync());
+                    EntityEntry dbEntry = ex.Entries.Single();
+                    dbEntry.OriginalValues.SetValues(await dbEntry.GetDatabaseValuesAsync());
 
-                    UpdateRowVersionFromDb(entry);
+                    UpdateRowVersionFromDb(dbEntry);
                 }
             };
         }
 
-        private static void UpdateRowVersionFromDb(EntityEntry entry)
+        private static void UpdateRowVersionFromDb(EntityEntry dbEntry)
         {
-            var concurrencyCheckable = entry.Entity as IConcurrencyCheckable;
-            if (concurrencyCheckable != null)
+            object entity = dbEntry.Entity;
+
+            var concurrencyCheckableTimestamp = entity as IConcurrencyCheckable<byte[]>;
+            if (concurrencyCheckableTimestamp != null)
             {
-                concurrencyCheckable.RowVersion = (long)entry.Property("RowVersion").OriginalValue;
+                concurrencyCheckableTimestamp.RowVersion = (byte[])dbEntry.Property("RowVersion").OriginalValue;
+                return;
             }
-            var timestampCheckable = entry.Entity as ITimestampCheckable;
-            if (timestampCheckable != null)
+            var concurrencyCheckableLong = entity as IConcurrencyCheckable<long>;
+            if (concurrencyCheckableLong != null)
             {
-                timestampCheckable.RowVersion = (byte[])entry.Property("RowVersion").OriginalValue;
+                concurrencyCheckableLong.RowVersion = (long)dbEntry.Property("RowVersion").OriginalValue;
+                return;
+            }
+            var concurrencyCheckableGuid = entity as IConcurrencyCheckable<Guid>;
+            if (concurrencyCheckableGuid != null)
+            {
+                concurrencyCheckableGuid.RowVersion = (Guid)dbEntry.Property("RowVersion").OriginalValue;
+                return;
             }
         }
     }

@@ -53,16 +53,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     DeletedUtc DATETIME,
                     DeleterUserId INTEGER,
 
-                    RowVersion INTEGER DEFAULT 0
+                    RowVersion TEXT
                 );
-
-                CREATE TRIGGER TRG_Posts_UPD
-                    AFTER UPDATE ON Posts
-                    WHEN old.RowVersion = new.RowVersion
-                BEGIN
-                    UPDATE Posts
-                    SET RowVersion = RowVersion + 1;
-                END;
 
                 CREATE TABLE Settings (
                     Key TEXT PRIMARY KEY,
