@@ -117,10 +117,6 @@ namespace EntityFramework.ChangeTrackingExtensions
                 .HasMaxLength(3);
 
             transactionLog
-                .Property(e => e.Schema)
-                .IsRequired();
-
-            transactionLog
                 .Property(e => e.TableName)
                 .IsRequired();
 

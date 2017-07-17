@@ -20,10 +20,13 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod, ExpectedException(typeof(DbUpdateConcurrencyException))]
         public void TestConcurrencyCheckableGuidEntities()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
+                var user = new User();
+                context.Users.Add(user);
+
                 // insert
-                var post = new Post { Title = "first" };
+                var post = new Post { Title = "first", Author = user };
                 context.Posts.Add(post);
 
                 context.SaveChanges();
@@ -52,16 +55,55 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
         }
-        
+
+        [TestMethod, ExpectedException(typeof(DbUpdateConcurrencyException))]
+        public void TestConcurrencyCheckableLongEntities()
+        {
+            using (var context = CreateSqliteDbContext())
+            {
+                // insert
+                var settings = new Settings { Key = "first", Value = "test" };
+                context.Settings.Add(settings);
+
+                context.SaveChanges();
+                context.Entry(settings).Reload();
+                Assert.AreEqual(default(long), settings.RowVersion);
+
+                // update
+                long oldRowVersion = settings.RowVersion;
+                settings.Value = "second";
+
+                try
+                {
+                    context.SaveChanges();
+                    context.Entry(settings).Reload();
+                    Assert.AreNotEqual(oldRowVersion, settings.RowVersion);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    Assert.Fail();
+                }
+
+                // concurrency error
+                settings.Value = "third";
+                settings.RowVersion = oldRowVersion;
+
+                context.SaveChanges();
+            }
+        }
+
         [TestMethod]
         public void TestSaveChangesIgnoreConcurrency()
         {
             Guid rowVersionFromClient = Guid.NewGuid();
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
+                var user = new User();
+                context.Users.Add(user);
+
                 // insert
-                var post = new Post { Title = "first" };
+                var post = new Post { Title = "first", Author = user };
                 context.Posts.Add(post);
 
                 context.SaveChanges();
@@ -84,10 +126,13 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         {
             Guid rowVersionFromClient = Guid.NewGuid();
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
+                var user = new User();
+                context.Users.Add(user);
+
                 // insert
-                var post = new Post { Title = "first" };
+                var post = new Post { Title = "first", Author = user };
                 context.Posts.Add(post);
 
                 await context.SaveChangesAsync();

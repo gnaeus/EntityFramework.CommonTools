@@ -14,7 +14,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestJsonFieldWithDbContext()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var settings = new Settings
                 {
@@ -27,7 +27,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var settings = context.Settings.Find("first");
 

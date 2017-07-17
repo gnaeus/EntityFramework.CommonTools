@@ -59,7 +59,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
     }
 
     [Table("Settings")]
-    public class Settings : IFullAuditable
+    public class Settings : IFullAuditable, IConcurrencyCheckable<long>
     {
         [Key]
         public string Key { get; set; }
@@ -87,5 +87,9 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
         public DateTime? UpdatedUtc { get; set; }
         public string DeleterUser { get; set; }
         public DateTime? DeletedUtc { get; set; }
+
+        [ConcurrencyCheck]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public long RowVersion { get; set; }
     }
 }

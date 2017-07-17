@@ -82,6 +82,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
         protected TestDbContext CreateTestDbContext()
         {
+            return CreateSqliteDbContext();
+        }
+
+        protected TestDbContext CreateSqliteDbContext()
+        {
             return new TestDbContext(_connection);
         }
 

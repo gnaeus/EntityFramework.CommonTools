@@ -1,33 +1,42 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 {
     public abstract class TestInitializer
     {
+        private SqliteConnection _connection;
+
         public TestContext TestContext { get; set; }
         
-        protected string GetDbName()
+        protected string GetInMemoryDbName()
         {
             return $"{TestContext.FullyQualifiedTestClassName}.{TestContext.TestName}";
+        }
+
+        protected TestDbContext CreateTestDbContext()
+        {
+            return new TestDbContext(GetInMemoryDbName());
+        }
+
+        protected TestDbContext CreateSqliteDbContext()
+        {
+            return new TestDbContext(_connection);
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            using (var context = CreateTestDbContext())
-            {
-                context.Database.EnsureCreated();
-            }
+            _connection = new SqliteConnection("data source=:memory:");
+
+            _connection.Open();
         }
         
-        protected TestDbContext CreateTestDbContext()
-        {
-            return new TestDbContext(GetDbName());
-        }
-
         [TestCleanup]
         public void TestCleanup()
         {
+            _connection.Close();
+
             using (var context = CreateTestDbContext())
             {
                 context.Database.EnsureDeleted();
