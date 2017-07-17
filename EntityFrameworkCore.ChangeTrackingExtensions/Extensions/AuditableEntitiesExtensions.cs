@@ -74,6 +74,7 @@ namespace EntityFramework.ChangeTrackingExtensions
                     if (modificationAuditable != null)
                     {
                         modificationAuditable.UpdaterUserId = editorUserId;
+                        dbEntry.CurrentValues[nameof(IModificationAuditable<TUserId>.UpdaterUserId)] = editorUserId;
                     }
                     break;
 
@@ -82,11 +83,13 @@ namespace EntityFramework.ChangeTrackingExtensions
                     if (deletionAuditable != null)
                     {
                         deletionAuditable.DeleterUserId = editorUserId;
+                        dbEntry.CurrentValues[nameof(IDeletionAuditable<TUserId>.DeleterUserId)] = editorUserId;
+                        // TODO: what about EntityState.Unchanged ?
                     }
                     break;
 
                 default:
-                    throw new InvalidOperationException();
+                    throw new NotSupportedException();
             }
             
             UpdateTrackableEntity(dbEntry, utcNow);
@@ -112,6 +115,7 @@ namespace EntityFramework.ChangeTrackingExtensions
                     if (modificationAuditable != null)
                     {
                         modificationAuditable.UpdaterUser = editorUser;
+                        dbEntry.CurrentValues[nameof(IModificationAuditable.UpdaterUser)] = editorUser;
                     }
                     break;
 
@@ -120,11 +124,13 @@ namespace EntityFramework.ChangeTrackingExtensions
                     if (deletionAuditable != null)
                     {
                         deletionAuditable.DeleterUser = editorUser;
+                        dbEntry.CurrentValues[nameof(IDeletionAuditable.DeleterUser)] = editorUser;
+                        // TODO: what about EntityState.Unchanged ?
                     }
                     break;
 
                 default:
-                    throw new InvalidOperationException();
+                    throw new NotSupportedException();
             }
 
             UpdateTrackableEntity(dbEntry, utcNow);
