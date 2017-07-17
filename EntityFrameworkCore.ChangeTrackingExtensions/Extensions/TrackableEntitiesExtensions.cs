@@ -53,6 +53,7 @@ namespace EntityFramework.ChangeTrackingExtensions
                     if (modificatonTrackable != null)
                     {
                         modificatonTrackable.UpdatedUtc = utcNow;
+                        dbEntry.CurrentValues[nameof(IModificationTrackable.UpdatedUtc)] = utcNow;
                     }
                     break;
 
@@ -60,19 +61,22 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var softDeletable = entity as ISoftDeletable;
                     if (softDeletable != null)
                     {
+                        dbEntry.State = EntityState.Unchanged;
+
                         var deletionTrackable = entity as IDeletionTrackable;
                         if (deletionTrackable != null)
                         {
                             deletionTrackable.DeletedUtc = utcNow;
+                            dbEntry.CurrentValues[nameof(IDeletionTrackable.DeletedUtc)] = utcNow;
                         }
 
                         softDeletable.IsDeleted = true;
-                        dbEntry.State = EntityState.Modified;
+                        dbEntry.CurrentValues[nameof(ISoftDeletable.IsDeleted)] = true;
                     }
                     break;
 
                 default:
-                    throw new InvalidOperationException();
+                    throw new NotSupportedException();
             }
         }
     }

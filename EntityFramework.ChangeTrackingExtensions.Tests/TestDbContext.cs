@@ -19,6 +19,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             Database.SetInitializer<TestDbContext>(null);
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.UseTransactionLog();
+        }
+
         public override int SaveChanges()
         {
             using (this.WithChangeTrackingOnce())
@@ -35,7 +40,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             using (this.WithChangeTrackingOnce())
             {
                 this.UpdateAuditableEntities(editorUserId);
-                // this.UpdateTrackableEntities();
+                this.UpdateTrackableEntities();
                 this.UpdateConcurrentEntities();
 
                 return this.SaveChangesWithTransactionLog(base.SaveChanges);
@@ -47,7 +52,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             using (this.WithChangeTrackingOnce())
             {
                 this.UpdateAuditableEntities(editorUser);
-                // this.UpdateTrackableEntities();
+                this.UpdateTrackableEntities();
                 this.UpdateConcurrentEntities();
 
                 return this.SaveChangesWithTransactionLog(base.SaveChanges);
@@ -70,7 +75,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             using (this.WithChangeTrackingOnce())
             {
                 this.UpdateAuditableEntities(editorUserId);
-                // this.UpdateTrackableEntities();
+                this.UpdateTrackableEntities();
                 this.UpdateConcurrentEntities();
 
                 return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync);
@@ -82,16 +87,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             using (this.WithChangeTrackingOnce())
             {
                 this.UpdateAuditableEntities(editorUser);
-                // this.UpdateTrackableEntities();
+                this.UpdateTrackableEntities();
                 this.UpdateConcurrentEntities();
 
                 return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync);
             }
-        }
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.UseTransactionLog();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
-namespace EntityFramework.ChangeTrackingExtensions.Tests
+namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 {
     public class User : IFullTrackable, ITransactionLoggable
     {
@@ -19,7 +19,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         public DateTime? UpdatedUtc { get; set; }
         public DateTime? DeletedUtc { get; set; }
     }
-    
+
     public class Post : IFullAuditable<int>, IConcurrencyCheckable<Guid>, ITransactionLoggable
     {
         public int Id { get; set; }
@@ -36,12 +36,13 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             set { _tags.Json = value; }
         }
 
+        [NotMapped]
         public ICollection<string> Tags
         {
             get { return _tags.Value; }
             set { _tags.Value = value; }
         }
-        
+
         public bool IsDeleted { get; set; }
         public int CreatorUserId { get; set; }
         public DateTime CreatedUtc { get; set; }
@@ -58,7 +59,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
     }
 
     [Table("Settings")]
-    public class Settings : IFullAuditable, IConcurrencyCheckable<long>
+    public class Settings : IFullAuditable
     {
         [Key]
         public string Key { get; set; }
@@ -72,12 +73,13 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             set { _value.Json = value; }
         }
 
+        [NotMapped]
         public dynamic Value
         {
             get { return _value.Value; }
             set { _value.Value = value; }
         }
-        
+
         public bool IsDeleted { get; set; }
         public string CreatorUser { get; set; }
         public DateTime CreatedUtc { get; set; }
@@ -85,9 +87,5 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         public DateTime? UpdatedUtc { get; set; }
         public string DeleterUser { get; set; }
         public DateTime? DeletedUtc { get; set; }
-
-        [ConcurrencyCheck]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public long RowVersion { get; set; }
     }
 }

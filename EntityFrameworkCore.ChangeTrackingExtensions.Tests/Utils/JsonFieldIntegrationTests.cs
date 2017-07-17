@@ -1,6 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if EF_CORE
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFramework.ChangeTrackingExtensions.Tests
+#endif
 {
     [TestClass]
     public class JsonFieldIntegrationTests : TestInitializer
@@ -8,7 +14,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestJsonFieldWithDbContext()
         {
-            using (var context = new TestDbContext(_connection))
+            using (var context = CreateTestDbContext())
             {
                 var settings = new Settings
                 {
@@ -21,7 +27,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
 
-            using (var context = new TestDbContext(_connection))
+            using (var context = CreateTestDbContext())
             {
                 var settings = context.Settings.Find("first");
 

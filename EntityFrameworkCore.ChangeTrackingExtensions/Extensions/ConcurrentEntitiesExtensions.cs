@@ -19,6 +19,8 @@ namespace EntityFramework.ChangeTrackingExtensions
 {
     public static partial class DbContextExtensions
     {
+        private const string ROW_VERSION = nameof(IConcurrencyCheckable<Guid>.RowVersion);
+
         /// <summary>
         /// Populate RowVersion propertiy for <see cref="IConcurrencyCheckable"/> or
         /// <see cref="ITimestampCheckable"/> Entities in context from client-side values.
@@ -27,11 +29,11 @@ namespace EntityFramework.ChangeTrackingExtensions
         /// EF automatically detects if byde[] RowVersion is changed by reference (not only by value)
         /// and gentrates code like 'DECLARE @p int; UPDATE [Table] SET @p = 0 WHERE RowWersion = ...'
         /// </remarks>
-        public static void UpdateConcurrentEntities(this DbContext context)
+        public static void UpdateConcurrentEntities(this DbContext dbContext)
         {
             DateTime utcNow = DateTime.UtcNow;
 
-            var changedEntries = context.ChangeTracker.Entries()
+            var changedEntries = dbContext.ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Modified
                          || e.State == EntityState.Deleted);
 
@@ -43,26 +45,32 @@ namespace EntityFramework.ChangeTrackingExtensions
                 if (concurrencyCheckableTimestamp != null)
                 {
                     // take row version from entity that modified by client
-                    dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckableTimestamp.RowVersion;
+                    dbEntry.OriginalValues[ROW_VERSION] = concurrencyCheckableTimestamp.RowVersion;
                     continue;
                 }
                 var concurrencyCheckableLong = entity as IConcurrencyCheckable<long>;
                 if (concurrencyCheckableLong != null)
                 {
                     // take row version from entity that modified by client
-                    dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckableLong.RowVersion;
+                    dbEntry.OriginalValues[ROW_VERSION] = concurrencyCheckableLong.RowVersion;
                     continue;
                 }
                 var concurrencyCheckableGuid = entity as IConcurrencyCheckable<Guid>;
                 if (concurrencyCheckableGuid != null)
                 {
                     // take row version from entity that modified by client
-                    dbEntry.Property("RowVersion").OriginalValue = concurrencyCheckableGuid.RowVersion;
+                    dbEntry.OriginalValues[ROW_VERSION] = concurrencyCheckableGuid.RowVersion;
                     // generate new row version
                     concurrencyCheckableGuid.RowVersion = Guid.NewGuid();
                     continue;
                 }
             }
+#if !EF_CORE
+            if (!dbContext.Configuration.AutoDetectChangesEnabled)
+            {
+                dbContext.ChangeTracker.DetectChanges();
+            }
+#endif
         }
 
         /// <summary>
@@ -70,14 +78,14 @@ namespace EntityFramework.ChangeTrackingExtensions
         /// http://msdn.microsoft.com/en-us/data/jj592904.aspx
         /// </summary>
         public static void SaveChangesIgnoreConcurrency(
-            this DbContext context, int retryCount = 3)
+            this DbContext dbContext, int retryCount = 3)
         {
             int errorCount = 0;
             for (;;)
             {
                 try
                 {
-                    context.SaveChanges();
+                    dbContext.SaveChanges();
                     break;
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -100,14 +108,14 @@ namespace EntityFramework.ChangeTrackingExtensions
         /// http://msdn.microsoft.com/en-us/data/jj592904.aspx
         /// </summary>
         public static async Task SaveChangesIgnoreConcurrencyAsync(
-            this DbContext context, int retryCount = 3)
+            this DbContext dbContext, int retryCount = 3)
         {
             int errorCount = 0;
             for (;;)
             {
                 try
                 {
-                    await context.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync();
                     break;
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -132,19 +140,19 @@ namespace EntityFramework.ChangeTrackingExtensions
             var concurrencyCheckableTimestamp = entity as IConcurrencyCheckable<byte[]>;
             if (concurrencyCheckableTimestamp != null)
             {
-                concurrencyCheckableTimestamp.RowVersion = (byte[])dbEntry.Property("RowVersion").OriginalValue;
+                concurrencyCheckableTimestamp.RowVersion = (byte[])dbEntry.OriginalValues[ROW_VERSION];
                 return;
             }
             var concurrencyCheckableLong = entity as IConcurrencyCheckable<long>;
             if (concurrencyCheckableLong != null)
             {
-                concurrencyCheckableLong.RowVersion = (long)dbEntry.Property("RowVersion").OriginalValue;
+                concurrencyCheckableLong.RowVersion = (long)dbEntry.OriginalValues[ROW_VERSION];
                 return;
             }
             var concurrencyCheckableGuid = entity as IConcurrencyCheckable<Guid>;
             if (concurrencyCheckableGuid != null)
             {
-                concurrencyCheckableGuid.RowVersion = (Guid)dbEntry.Property("RowVersion").OriginalValue;
+                concurrencyCheckableGuid.RowVersion = (Guid)dbEntry.OriginalValues[ROW_VERSION];
                 return;
             }
         }

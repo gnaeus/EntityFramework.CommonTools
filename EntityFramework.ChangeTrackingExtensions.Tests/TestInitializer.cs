@@ -80,6 +80,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 END;");
         }
 
+        protected TestDbContext CreateTestDbContext()
+        {
+            return new TestDbContext(_connection);
+        }
+
         [TestCleanup]
         public void TestCleanup()
         {
