@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <Authors>Dmitry Panyushkin</Authors>
+    <Company />
+    <Copyright>Copyright © Dmitry Panyushkin 2017</Copyright>
+    <PackageLicenseUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Entity Framework Core;entity-framework-core;entityframeworkcore;Change Tracking;change-tracking;Complex Type;complex-type;Transaction Log;transaction-log</PackageTags>
+    <Description>A plugin for Microsoft.EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -103,7 +103,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod, ExpectedException(typeof(DbUpdateConcurrencyException))]
         public void TestConcurrencyCheckableDelete()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var first = new Role { Name = "first" };
                 var second = new Role { Name = "second" };
@@ -124,7 +124,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 }
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var role = context.Roles.First();
                 
@@ -140,7 +140,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 }
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var role = context.Roles.Single();
 

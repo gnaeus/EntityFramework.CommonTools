@@ -18,7 +18,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestTransactionLogInsert()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var post = new Post { Title = "test", Content = "test test test" };
 
@@ -36,7 +36,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var logs = context.TransactionLogs.ToArray();
 
@@ -62,7 +62,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestTransactionLogUpdate()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var user = new User { Login = "admin" };
                 var post = new Post { Title = "test", Content = "test test test", Author = user };
@@ -73,7 +73,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.OriginalSaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var user = context.Users.Single();
                 var post = context.Posts.Single();
@@ -84,7 +84,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var logs = context.TransactionLogs.ToArray();
 
@@ -110,7 +110,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestTransactionLogDelete()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var role = new Role { Name = "test" };
 
@@ -119,7 +119,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.OriginalSaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var role = context.Roles.Single();
 
@@ -128,7 +128,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var logs = context.TransactionLogs.ToArray();
 
@@ -145,7 +145,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestTransactionLogSoftDelete()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var user = new User { Login = "admin" };
                 var post = new Post { Title = "test", Content = "test test test", Author = user };
@@ -156,7 +156,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.OriginalSaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var user = context.Users.Single();
                 var post = context.Posts.Single();
@@ -167,7 +167,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChanges();
             }
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateSqliteDbContext())
             {
                 var logs = context.TransactionLogs.ToArray();
 
@@ -175,18 +175,24 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 Assert.AreEqual(2, logs.Length);
                 Assert.AreEqual(logs[0].TransactionId, logs[1].TransactionId);
                 Assert.AreEqual(logs[0].CreatedUtc, logs[1].CreatedUtc);
+#if EF_CORE
+                var userLog = logs[0];
+                var postLog = logs[1];
+#else
+                var userLog = logs[1];
+                var postLog = logs[0];
+#endif
+                Assert.AreEqual("Users", userLog.TableName);
+                Assert.AreEqual(TransactionLog.UPDATE, userLog.Operation);
+                Assert.IsInstanceOfType(userLog.Entity, typeof(User));
+                Assert.AreEqual(1, userLog.GetEntity<Entity>().Id);
+                Assert.IsTrue(userLog.GetEntity<User>().IsDeleted);
 
-                Assert.AreEqual("Posts", logs[0].TableName);
-                Assert.AreEqual(TransactionLog.UPDATE, logs[0].Operation);
-                Assert.IsInstanceOfType(logs[0].Entity, typeof(Post));
-                Assert.AreEqual(1, logs[0].GetEntity<Entity>().Id);
-                Assert.IsTrue(logs[0].GetEntity<Post>().IsDeleted);
-
-                Assert.AreEqual("Users", logs[1].TableName);
-                Assert.AreEqual(TransactionLog.UPDATE, logs[1].Operation);
-                Assert.IsInstanceOfType(logs[1].Entity, typeof(User));
-                Assert.AreEqual(1, logs[1].GetEntity<Entity>().Id);
-                Assert.IsTrue(logs[1].GetEntity<User>().IsDeleted);
+                Assert.AreEqual("Posts", postLog.TableName);
+                Assert.AreEqual(TransactionLog.UPDATE, postLog.Operation);
+                Assert.IsInstanceOfType(postLog.Entity, typeof(Post));
+                Assert.AreEqual(1, postLog.GetEntity<Entity>().Id);
+                Assert.IsTrue(postLog.GetEntity<Post>().IsDeleted);
             }
         }
 
@@ -232,33 +238,33 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 Assert.AreEqual(5, logs.Length);
                 Assert.IsTrue(logs.All(l => l.TransactionId == logs[0].TransactionId));
                 Assert.IsTrue(logs.All(l => l.CreatedUtc == logs[0].CreatedUtc));
-
+                Assert.IsTrue(logs.All(l => l.Schema == logs[0].Schema));
+#if EF_CORE
+                Assert.IsNull(logs[0].Schema);
+#else
                 Assert.AreEqual("dbo", logs[0].Schema);
+#endif
                 Assert.AreEqual("Posts", logs[0].TableName);
                 Assert.AreEqual(TransactionLog.INSERT, logs[0].Operation);
                 Assert.IsInstanceOfType(logs[0].Entity, typeof(Post));
                 Assert.AreEqual(3, logs[0].GetEntity<Post>().Id);
 
-                Assert.AreEqual("dbo", logs[1].Schema);
                 Assert.AreEqual("Users", logs[1].TableName);
                 Assert.AreEqual(TransactionLog.UPDATE, logs[1].Operation);
                 Assert.IsInstanceOfType(logs[1].Entity, typeof(User));
                 Assert.AreEqual(1, logs[1].GetEntity<User>().Id);
 
-                Assert.AreEqual("dbo", logs[2].Schema);
                 Assert.AreEqual("Posts", logs[2].TableName);
                 Assert.AreEqual(TransactionLog.UPDATE, logs[2].Operation);
                 Assert.IsInstanceOfType(logs[2].Entity, typeof(Post));
                 Assert.AreEqual(1, logs[2].GetEntity<Post>().Id);
 
-                Assert.AreEqual("dbo", logs[3].Schema);
                 Assert.AreEqual("Posts", logs[3].TableName);
                 Assert.AreEqual(TransactionLog.UPDATE, logs[3].Operation);
                 Assert.IsInstanceOfType(logs[3].Entity, typeof(Post));
                 Assert.AreEqual(2, logs[3].GetEntity<Post>().Id);
                 Assert.IsTrue(logs[3].GetEntity<Post>().IsDeleted);
 
-                Assert.AreEqual("dbo", logs[4].Schema);
                 Assert.AreEqual("Roles", logs[4].TableName);
                 Assert.AreEqual(TransactionLog.DELETE, logs[4].Operation);
                 Assert.IsInstanceOfType(logs[4].Entity, typeof(Role));

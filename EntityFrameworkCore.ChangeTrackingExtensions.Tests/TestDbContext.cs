@@ -93,7 +93,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 
         public void OriginalSaveChanges()
         {
-            base.SaveChanges();
+            base.SaveChanges(true);
         }
     }
 }
