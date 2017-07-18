@@ -78,6 +78,8 @@
     <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\Extensions\**\*.cs">
       <Link>Extensions\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <Compile Include="Extensions\TableNameExtensionsTests.cs" />
+    <Compile Include="Extensions\ChangeTrackingExtensionsTests.cs" />
     <Compile Include="TestInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDbContext.cs" />
