@@ -1,6 +1,5 @@
 ﻿using System.Data.Common;
 using System.Data.SQLite;
-using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFramework.ChangeTrackingExtensions.Tests
@@ -16,7 +15,9 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
             _connection.Open();
 
-            _connection.Execute(@"
+            using (var context = CreateSqliteDbContext())
+            {
+                context.Database.ExecuteSqlCommand(@"
                 CREATE TABLE _TransactionLog (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     TransactionId BLOB,
@@ -83,6 +84,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     UPDATE Settings
                     SET RowVersion = RowVersion + 1;
                 END;");
+            }
         }
 
         protected TestDbContext CreateTestDbContext()
