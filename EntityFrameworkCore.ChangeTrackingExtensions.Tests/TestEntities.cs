@@ -11,9 +11,12 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
         public int Id { get; set; }
     }
 
-    public class Role : Entity, ITransactionLoggable
+    public class Role : Entity, IConcurrencyCheckable<Guid>, ITransactionLoggable
     {
         public string Name { get; set; }
+
+        [ConcurrencyCheck]
+        public Guid RowVersion { get; set; }
     }
 
     public class User : Entity, IFullTrackable, ITransactionLoggable

@@ -1,5 +1,6 @@
 ﻿#if EF_CORE
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,6 +9,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 #else
 using System;
 using System.Data.Entity.Infrastructure;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,8 +19,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
     [TestClass]
     public class ConcurrentEntitiesTests : TestInitializer
     {
-        // TODO: delete IConcurrencyCheckable entity (but not ISoftDeletable)
-
         [TestMethod, ExpectedException(typeof(DbUpdateConcurrencyException))]
         public void TestConcurrencyCheckableGuidEntities()
         {
@@ -52,10 +52,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     Assert.Fail();
                 }
 
-                // concurrency error
+                // RowVersion is changed by client code
                 post.Title = "third";
                 post.RowVersion = oldRowVersion;
 
+                // should throw DbUpdateConcurrencyException
                 context.SaveChanges();
             }
         }
@@ -90,10 +91,65 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     Assert.Fail();
                 }
 
-                // concurrency error
+                // RowVersion is changed by client code
                 settings.Value = "third";
                 settings.RowVersion = oldRowVersion;
 
+                // should throw DbUpdateConcurrencyException
+                context.SaveChanges();
+            }
+        }
+
+        [TestMethod, ExpectedException(typeof(DbUpdateConcurrencyException))]
+        public void TestConcurrencyCheckableDelete()
+        {
+            using (var context = CreateTestDbContext())
+            {
+                var first = new Role { Name = "first" };
+                var second = new Role { Name = "second" };
+
+                try
+                {
+                    context.Roles.Add(first);
+                    context.Roles.Add(second);
+                    context.SaveChanges();
+
+                    first.Name = "changed";
+                    second.Name = "changed";
+                    context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    Assert.Fail();
+                }
+            }
+
+            using (var context = CreateTestDbContext())
+            {
+                var role = context.Roles.First();
+                
+                context.Roles.Remove(role);
+
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    Assert.Fail();
+                }
+            }
+
+            using (var context = CreateTestDbContext())
+            {
+                var role = context.Roles.Single();
+
+                // RowVersion is changed by client code
+                role.RowVersion = Guid.NewGuid();
+
+                context.Roles.Remove(role);
+
+                // should throw DbUpdateConcurrencyException
                 context.SaveChanges();
             }
         }

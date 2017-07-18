@@ -31,7 +31,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 CREATE TABLE Roles (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name TEXT
+                    Name TEXT,
+                    RowVersion TEXT
                 );
 
                 CREATE TABLE Users (
