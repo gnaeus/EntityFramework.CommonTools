@@ -8,9 +8,12 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 {
     public class TestDbContext : DbContext
     {
+        public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Settings> Settings { get; set; }
+
+        public DbSet<TransactionLog> TransactionLogs { get; set; }
 
         public TestDbContext(DbConnection connection)
             : base(connection, false)
@@ -47,18 +50,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
         }
 
-        public int SaveChanges(string editorUser)
-        {
-            using (this.WithChangeTrackingOnce())
-            {
-                this.UpdateAuditableEntities(editorUser);
-                this.UpdateTrackableEntities();
-                this.UpdateConcurrentEntities();
-
-                return this.SaveChangesWithTransactionLog(base.SaveChanges);
-            }
-        }
-
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             using (this.WithChangeTrackingOnce())
@@ -67,18 +58,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 this.UpdateConcurrentEntities();
 
                 return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync, cancellationToken);
-            }
-        }
-
-        public Task<int> SaveChangesAsync(int editorUserId)
-        {
-            using (this.WithChangeTrackingOnce())
-            {
-                this.UpdateAuditableEntities(editorUserId);
-                this.UpdateTrackableEntities();
-                this.UpdateConcurrentEntities();
-
-                return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync);
             }
         }
 
@@ -92,6 +71,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync);
             }
+        }
+
+        public void OriginalSaveChanges()
+        {
+            base.SaveChanges();
         }
     }
 }

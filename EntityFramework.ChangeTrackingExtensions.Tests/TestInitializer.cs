@@ -7,7 +7,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 {
     public abstract class TestInitializer
     {
-        protected DbConnection _connection;
+        private DbConnection _connection;
 
         [TestInitialize]
         public void TestInitialize()
@@ -26,6 +26,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     TableName TEXT,
                     EntityType TEXT,
                     EntityJson TEXT
+                );
+
+                CREATE TABLE Roles (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT
                 );
 
                 CREATE TABLE Users (

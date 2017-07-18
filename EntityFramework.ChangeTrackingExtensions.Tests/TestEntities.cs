@@ -6,9 +6,18 @@ using System.Runtime.Serialization;
 
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 {
-    public class User : IFullTrackable, ITransactionLoggable
+    public abstract class Entity
     {
         public int Id { get; set; }
+    }
+
+    public class Role : Entity, ITransactionLoggable
+    {
+        public string Name { get; set; }
+    }
+
+    public class User : Entity, IFullTrackable, ITransactionLoggable
+    {
         public string Login { get; set; }
 
         [Column("UserContacts")]
@@ -20,9 +29,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         public DateTime? DeletedUtc { get; set; }
     }
     
-    public class Post : IFullAuditable<int>, IConcurrencyCheckable<Guid>, ITransactionLoggable
+    public class Post : Entity, IFullAuditable<int>, IConcurrencyCheckable<Guid>, ITransactionLoggable
     {
-        public int Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
 
@@ -56,7 +64,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [ForeignKey(nameof(CreatorUserId))]
         public virtual User Author { get; set; }
     }
-
+    
     [Table("Settings")]
     public class Settings : IFullAuditable, IConcurrencyCheckable<long>
     {

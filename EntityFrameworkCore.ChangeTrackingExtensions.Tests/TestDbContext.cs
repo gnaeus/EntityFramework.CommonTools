@@ -8,6 +8,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 {
     public class TestDbContext : DbContext
     {
+        public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Settings> Settings { get; set; }
@@ -74,6 +75,25 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 
             return this.SaveChangesWithTransactionLogAsync(
                 base.SaveChangesAsync, acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        public int SaveChanges(int editorUserId)
+        {
+            this.UpdateAuditableEntities(editorUserId);
+
+            return SaveChanges();
+        }
+
+        public Task<int> SaveChangesAsync(string editorUser)
+        {
+            this.UpdateAuditableEntities(editorUser);
+
+            return SaveChangesAsync();
+        }
+
+        public void OriginalSaveChanges()
+        {
+            base.SaveChanges();
         }
     }
 }
