@@ -65,6 +65,8 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var creationAuditable = entity as ICreationAuditable<TUserId>;
                     if (creationAuditable != null)
                     {
+                        UpdateTrackableEntity(dbEntry, utcNow);
+
                         creationAuditable.CreatorUserId = editorUserId;
                     }
                     break;
@@ -73,6 +75,8 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var modificationAuditable = entity as IModificationAuditable<TUserId>;
                     if (modificationAuditable != null)
                     {
+                        UpdateTrackableEntity(dbEntry, utcNow);
+
                         modificationAuditable.UpdaterUserId = editorUserId;
                         dbEntry.CurrentValues[nameof(IModificationAuditable<TUserId>.UpdaterUserId)] = editorUserId;
                     }
@@ -82,17 +86,17 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var deletionAuditable = entity as IDeletionAuditable<TUserId>;
                     if (deletionAuditable != null)
                     {
+                        UpdateTrackableEntity(dbEntry, utcNow);
+                        
+                        // change CurrentValues after dbEntry.State becomes EntityState.Unchanged
                         deletionAuditable.DeleterUserId = editorUserId;
                         dbEntry.CurrentValues[nameof(IDeletionAuditable<TUserId>.DeleterUserId)] = editorUserId;
-                        // TODO: what about EntityState.Unchanged ?
                     }
                     break;
 
                 default:
                     throw new NotSupportedException();
             }
-            
-            UpdateTrackableEntity(dbEntry, utcNow);
         }
 
         private static void UpdateAuditableEntity(
@@ -106,6 +110,8 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var creationAuditable = entity as ICreationAuditable;
                     if (creationAuditable != null)
                     {
+                        UpdateTrackableEntity(dbEntry, utcNow);
+
                         creationAuditable.CreatorUser = editorUser;
                     }
                     break;
@@ -114,6 +120,8 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var modificationAuditable = entity as IModificationAuditable;
                     if (modificationAuditable != null)
                     {
+                        UpdateTrackableEntity(dbEntry, utcNow);
+
                         modificationAuditable.UpdaterUser = editorUser;
                         dbEntry.CurrentValues[nameof(IModificationAuditable.UpdaterUser)] = editorUser;
                     }
@@ -123,17 +131,17 @@ namespace EntityFramework.ChangeTrackingExtensions
                     var deletionAuditable = entity as IDeletionAuditable;
                     if (deletionAuditable != null)
                     {
+                        UpdateTrackableEntity(dbEntry, utcNow);
+
+                        // change CurrentValues after dbEntry.State becomes EntityState.Unchanged
                         deletionAuditable.DeleterUser = editorUser;
                         dbEntry.CurrentValues[nameof(IDeletionAuditable.DeleterUser)] = editorUser;
-                        // TODO: what about EntityState.Unchanged ?
                     }
                     break;
 
                 default:
                     throw new NotSupportedException();
             }
-
-            UpdateTrackableEntity(dbEntry, utcNow);
         }
     }
 }

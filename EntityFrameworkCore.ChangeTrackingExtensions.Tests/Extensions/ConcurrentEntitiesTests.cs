@@ -15,7 +15,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif
 {
     [TestClass]
-    public partial class ConcurrentEntitiesTests : TestInitializer
+    public class ConcurrentEntitiesTests : TestInitializer
     {
         // TODO: delete IConcurrencyCheckable entity (but not ISoftDeletable)
 
@@ -32,6 +32,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.Posts.Add(post);
 
                 context.SaveChanges();
+
                 context.Entry(post).Reload();
                 Assert.AreEqual(default(Guid), post.RowVersion);
 
@@ -42,6 +43,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 try
                 {
                     context.SaveChanges();
+
                     context.Entry(post).Reload();
                     Assert.AreNotEqual(oldRowVersion, post.RowVersion);
                 }
@@ -64,10 +66,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             using (var context = CreateSqliteDbContext())
             {
                 // insert
-                var settings = new Settings { Key = "first", Value = "test" };
+                var settings = new Settings { Key = "first", Value = "first" };
                 context.Settings.Add(settings);
 
                 context.SaveChanges();
+
                 context.Entry(settings).Reload();
                 Assert.AreEqual(default(long), settings.RowVersion);
 
@@ -78,6 +81,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 try
                 {
                     context.SaveChanges();
+
                     context.Entry(settings).Reload();
                     Assert.AreNotEqual(oldRowVersion, settings.RowVersion);
                 }
@@ -117,7 +121,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 context.SaveChangesIgnoreConcurrency();
 
                 context.Entry(post).Reload();
-
                 Assert.AreEqual("second", post.Title);
                 Assert.AreNotEqual(rowVersionFromClient, post.RowVersion);
             }
@@ -146,7 +149,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 await context.SaveChangesIgnoreConcurrencyAsync();
 
                 context.Entry(post).Reload();
-
                 Assert.AreEqual("second", post.Title);
                 Assert.AreNotEqual(rowVersionFromClient, post.RowVersion);
             }

@@ -63,15 +63,15 @@ namespace EntityFramework.ChangeTrackingExtensions
                     {
                         dbEntry.State = EntityState.Unchanged;
 
+                        softDeletable.IsDeleted = true;
+                        dbEntry.CurrentValues[nameof(ISoftDeletable.IsDeleted)] = true;
+
                         var deletionTrackable = entity as IDeletionTrackable;
                         if (deletionTrackable != null)
                         {
                             deletionTrackable.DeletedUtc = utcNow;
                             dbEntry.CurrentValues[nameof(IDeletionTrackable.DeletedUtc)] = utcNow;
                         }
-
-                        softDeletable.IsDeleted = true;
-                        dbEntry.CurrentValues[nameof(ISoftDeletable.IsDeleted)] = true;
                     }
                     break;
 
