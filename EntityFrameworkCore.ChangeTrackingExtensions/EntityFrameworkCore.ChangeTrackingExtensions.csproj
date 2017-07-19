@@ -2,25 +2,31 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <PackageId>EntityFrameworkCore.ChangeTrackingExtensions</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Description>A plugin for Microsoft.EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</Description>
     <Authors>Dmitry Panyushkin</Authors>
-    <Company />
-    <Copyright>Copyright © Dmitry Panyushkin 2017</Copyright>
     <PackageLicenseUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/icon_48x48.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Entity Framework Core;entity-framework-core;entityframeworkcore;Change Tracking;change-tracking;Complex Type;complex-type;Transaction Log;transaction-log</PackageTags>
-    <Description>A plugin for Microsoft.EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Copyright>Copyright © Dmitry Panyushkin 2017</Copyright>
+    <PackageTags>EF EFCore EntityFrameworkCore EntityFramework Entity Framework ChangeTracking Change Tracking AuditLog Audit Log TransactionLog Transaction Log ComplexType Complex Type JSON</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;EF_CORE</DefineConstants>
     <OutputPath>bin\Debug\</OutputPath>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE;EF_CORE</DefineConstants>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
