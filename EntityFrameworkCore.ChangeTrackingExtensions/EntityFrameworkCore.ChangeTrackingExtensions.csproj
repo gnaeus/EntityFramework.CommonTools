@@ -8,7 +8,7 @@
     <Authors>Dmitry Panyushkin</Authors>
     <PackageLicenseUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/icon_48x48.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
