@@ -1,13 +1,18 @@
 # <img src="icon.png" style="height: 32px; vertical-align: text-bottom" /> EntityFramework.ChangeTrackingExtensions
  An extension for EntityFramework and EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from `DbContext` to Transaction Log.
 
----
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/LICENSE)
+[![NuGet version](https://img.shields.io/nuget/v/EntityFramework.ChangeTrackingExtensions.svg)](https://www.nuget.org/packages/EntityFramework.ChangeTrackingExtensions)
+[![NuGet version](https://img.shields.io/nuget/v/EntityFrameworkCore.ChangeTrackingExtensions.svg)](https://www.nuget.org/packages/EntityFrameworkCore.ChangeTrackingExtensions)
+
 ## Documentation
  * [JSON Complex Types](#ef-json-field)
  * [Auditable Entities](#ef-auditable-entities)
  * [Concurrency Checkes](#ef-auditable-entities)
  * [Transaction Logs](#ef-transaction-logs)
  * [Extensions (EF 6 only)](#ef-6-only)
+
+<br>
 
 ### <a name="ef-json-field"></a> JSON Complex Types
 There is an utility struct named `JsonField`, that helps to persist any Complex Type as JSON string in single table column.
