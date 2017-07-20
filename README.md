@@ -1,5 +1,5 @@
 # <img src="icon.png" style="height: 32px; vertical-align: text-bottom" /> EntityFramework.ChangeTrackingExtensions
- An extension for EntityFramework and EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from `DbContext` to Transaction Log.
+ An extension for EntityFramework and EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing Complex Types as JSON and storing history of all changes from `DbContext` to Transaction Log.
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/LICENSE)
 [![NuGet version](https://img.shields.io/nuget/v/EntityFramework.ChangeTrackingExtensions.svg)](https://www.nuget.org/packages/EntityFramework.ChangeTrackingExtensions)
@@ -8,7 +8,7 @@
 ## Documentation
  * [JSON Complex Types](#ef-json-field)
  * [Auditable Entities](#ef-auditable-entities)
- * [Concurrency Checkes](#ef-auditable-entities)
+ * [Concurrency Checks](#ef-concurrency-checks)
  * [Transaction Logs](#ef-transaction-logs)
  * [Extensions (EF 6 only)](#ef-6-only)
 
@@ -267,11 +267,112 @@ Related properties automatically set when saving/updating/deleting Entity object
 
 <br>
 
-There are also two overloadings for `DbContext.UpdateAudiatbleEntities()`
+You can choose between saving the user `Id` or the user `Login`.  
+So there are two overloadings for `DbContext.UpdateAudiatbleEntities()`:
 ```cs
 static void UpdateAuditableEntities<TUserId>(this DbContext context, TUserId editorUserId);
 static void UpdateAuditableEntities(this DbContext context, string editorUser);
 ```
-And you can choose between saving the user Id or the user Login.
+and also the separate extension to update only `Trackable` entities:
+```cs
+static void UpdateTrackableEntities(this DbContext context);
+```
+
+<br>
+
+### <a name="ef-concurrency-checks"></a> Concurrency Checks
+By default EF and EFCore uses `EntityEntry.OriginalValues["RowVersion"]` for concurrency checks
+([see docs](https://docs.microsoft.com/en-us/ef/core/saving/concurrency)).  
+With this behaviour the concurrency conflict may occur only between `SELECT` statement
+that loads entities to the `DbContext` and `UPDATE` statement from `DbContext.SaveChanges()`.
+
+But sometimes we want check concurrency conflicts between two or more edit operations that comes from client-side. For example:
+
+* User1 loads the editor form
+* User2 loads the same editor form
+* User1 saves his changes
+* User2 saves his changes __and gets concurrency conflict__.
+
+To provide this behaviour, an entity should implement the following interface:
+```cs
+interface IConcurrencyCheckable<TRowVersion>
+{
+    TRowVersion RowVersion { get; set; }
+}
+```
+And the `DbContext` should overload `SaveChanges()` method with `UpdateConcurrentEntities()` extension:
+```cs
+class MyDbContext : DbContext
+{
+    public override int SaveChanges()
+    {
+        this.UpdateConcurrentEntities();
+        return base.SaveChanges();
+    }
+}
+```
+
+<br>
+
+There are also three different behaviours for `IConcurrencyCheckable<T>`:
+
+#### `IConcurrencyCheckable<byte[]>`
+```cs
+class MyEntity : IConcurrencyCheckable<Guid>
+{
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
+}
+```
+`RowVersion` property should be decorated by `[Timestamp]` attribute.  
+`RowVersion` column should have `ROWVERSION` type in SQL Server.  
+The default behaviour. Supported only by Microsoft SQL Server.
+
+<br>
+
+#### `IConcurrencyCheckable<Guid>`
+```cs
+class MyEntity : IConcurrencyCheckable<Guid>
+{
+    [ConcurrencyCheck]
+    public Guid RowVersion { get; set; }
+}
+```
+`RowVersion` property should be decorated by `[ConcurrencyCheck]` attribute.  
+It's value is populated by `Guid.NewGuid()` during each `DbContext.SaveChanges()` call at client-side.  
+No specific database support is needed.
+
+<br>
+
+#### `IConcurrencyCheckable<long>`
+```cs
+class MyEntity : IConcurrencyCheckable<long>
+{
+    [ConcurrencyCheck]
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public long RowVersion { get; set; }
+}
+```
+`RowVersion` property should be decorated by `[ConcurrencyCheck]` and `[DatabaseGenerated(DatabaseGeneratedOption.Computed)]` attributes.  
+`RowVersion` column should be updated by trigger in DB. Example for SQLite:
+```sql
+CREATE TABLE MyTable ( RowVersion INTEGER DEFAULT 0 );
+
+CREATE TRIGGER TRG_MyTable_UPD
+AFTER UPDATE ON MyTable
+    WHEN old.RowVersion = new.RowVersion
+BEGIN
+    UPDATE MyTable
+    SET RowVersion = RowVersion + 1;
+END;
+```
+
+<br>
+
+### <a name="ef-transaction-logs"></a> Transaction Logs
+
+<br>
+
+### <a name="ef-6-only"></a> Extensions (EF 6 only)
 
 <br>

@@ -22,8 +22,8 @@ namespace EntityFramework.ChangeTrackingExtensions
         private const string ROW_VERSION = nameof(IConcurrencyCheckable<Guid>.RowVersion);
 
         /// <summary>
-        /// Populate RowVersion propertiy for <see cref="IConcurrencyCheckable"/> or
-        /// <see cref="ITimestampCheckable"/> Entities in context from client-side values.
+        /// Populate RowVersion propertiy of <see cref="IConcurrencyCheckable{T}"/>
+        /// Entities in context from client-side values.
         /// </summary>
         /// <remarks>
         /// EF automatically detects if byde[] RowVersion is changed by reference (not only by value)
