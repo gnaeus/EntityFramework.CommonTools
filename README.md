@@ -10,7 +10,9 @@
  * [Auditable Entities](#ef-auditable-entities)
  * [Concurrency Checks](#ef-concurrency-checks)
  * [Transaction Logs](#ef-transaction-logs)
- * [Extensions (EF 6 only)](#ef-6-only)
+ * [DbContext Extensions (EF 6 only)](#ef-6-only)
+ * [Usage with EntityFrameworkCore](#ef-core-usage)
+ * [Usage with EntityFramework 6](#ef-6-usage)
 
 <br>
 
@@ -373,6 +375,146 @@ END;
 
 <br>
 
-### <a name="ef-6-only"></a> Extensions (EF 6 only)
+### <a name="ef-6-only"></a> DbContext Extensions (EF 6 only)
+
+__`static IDisposable WithoutChangeTracking(this DbContext dbContext)`__  
+Disposable token for `using(...)` statement where `DbContext.Configuration.AutoDetectChanges` is disabled.
+
+```cs
+// here AutoDetectChanges is enabled
+using (dbContext.WithoutChangeTracking())
+{
+    // inside this block AutoDetectChangesis disabled
+}
+// here AutoDetectChanges is enabled again
+```
 
 <br>
+
+__`static IDisposable WithChangeTrackingOnce(this DbContext dbContext)`__  
+Run `DbChangeTracker.DetectChanges()` once and return disposable token for `using(...)` statement
+where `DbContext.Configuration.AutoDetectChanges` is disabled.
+
+```cs
+// here AutoDetectChanges is enabled
+using (dbContext.WithChangeTrackingOnce())
+{
+    // inside this block AutoDetectChangesis disabled
+}
+// here AutoDetectChanges is enabled again
+```
+
+<br>
+
+__`static TableAndSchema GetTableAndSchemaName(this DbContext context, Type entityType)`__  
+Get corresponding table name and schema by `entityType`.
+
+__`static TableAndSchema[] GetTableAndSchemaNames(this DbContext context, Type entityType)`__  
+Get corresponding table name and schema by `entityType`.
+Use it if entity is splitted between multiple tables.
+
+```cs
+struct TableAndSchema
+{
+    public string TableName;
+    public string Schema;
+}
+```
+
+<br>
+
+### <a name="ef-core-usage"></a> All together example for EntityFrameworkCore
+```cs
+class MyDbContext : DbContext
+{
+    protected override void OnModelCreating(DbModelBuilder modelBuilder)
+    {
+        modelBuilder.UseTransactionLog();
+    }
+
+    // override the most general SaveChanges
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        this.UpdateTrackableEntities();
+        this.UpdateConcurrentEntities();
+
+        return this.SaveChangesWithTransactionLog(base.SaveChanges, acceptAllChangesOnSuccess);
+    }
+
+    // override the most general SaveChangesAsync
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+    {
+        this.UpdateTrackableEntities();
+        this.UpdateConcurrentEntities();
+
+        return this.SaveChangesWithTransactionLogAsync(
+            base.SaveChangesAsync, acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    public int SaveChanges(int editorUserId)
+    {
+        this.UpdateAuditableEntities(editorUserId);
+        
+        return SaveChanges();
+    }
+
+    public Task<int> SaveChangesAsync(int editorUserId)
+    {
+        this.UpdateAuditableEntities(editorUserId);
+
+        return SaveChangesAsync();
+    }
+}
+```
+
+<br>
+
+### <a name="ef-6-usage"></a> All together example for EntityFramework 6
+```cs
+class MyDbContext : DbContext
+{
+    protected override void OnModelCreating(DbModelBuilder modelBuilder)
+    {
+        modelBuilder.UseTransactionLog();
+    }
+
+    // override the most general SaveChanges
+    public override int SaveChanges()
+    {
+        using (this.WithChangeTrackingOnce())
+        {
+            this.UpdateTrackableEntities();
+            this.UpdateConcurrentEntities();
+
+            return this.SaveChangesWithTransactionLog(base.SaveChanges);
+        }
+    }
+
+    // override the most general SaveChangesAsync
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        using (this.WithChangeTrackingOnce())
+        {
+            this.UpdateTrackableEntities();
+            this.UpdateConcurrentEntities();
+
+            return this.SaveChangesWithTransactionLogAsync(base.SaveChangesAsync, cancellationToken);
+        }
+    }
+
+    public int SaveChanges(int editorUserId)
+    {
+        this.UpdateAuditableEntities(editorUserId);
+        
+        return SaveChanges();
+    }
+
+    public Task<int> SaveChangesAsync(int editorUserId)
+    {
+        this.UpdateAuditableEntities(editorUserId);
+
+        return SaveChangesAsync();
+    }
+}
+```
