@@ -1,5 +1,5 @@
 # <img src="icon.png" style="height: 32px; vertical-align: text-bottom" /> EntityFramework.ChangeTrackingExtensions
- An extension for EntityFramework and EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing Complex Types as JSON and storing history of all changes from `DbContext` to Transaction Log.
+ An extension for EntityFramework and EntityFramework Core that provides Auditing, Concurrency Checks, storing Complex Types as JSON and storing history of all changes from DbContext to Transaction Log.
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/LICENSE)
 [![NuGet version](https://img.shields.io/nuget/v/EntityFramework.ChangeTrackingExtensions.svg)](https://www.nuget.org/packages/EntityFramework.ChangeTrackingExtensions)
@@ -11,7 +11,7 @@
  * [Concurrency Checks](#ef-concurrency-checks)
  * [Transaction Logs](#ef-transaction-logs)
  * [DbContext Extensions (EF 6 only)](#ef-6-only)
- * [Usage with EntityFrameworkCore](#ef-core-usage)
+ * [Usage with EntityFramework Core](#ef-core-usage)
  * [Usage with EntityFramework 6](#ef-6-usage)
 
 <br>
@@ -73,7 +73,7 @@ class Address
 }
 ```
 
-If we update such JSON properties the following SQL is generated during `SaveChanges`:
+If we update these Complex Type properties, the following SQL is generated during `SaveChanges`:
 ```sql
 UPDATE Users
 SET AddressJson = '{"City":"Moscow","Street":"Arbat","Building":"10"}',
@@ -112,9 +112,8 @@ Because `JsonField` uses [Jil](https://github.com/kevin-montrose/Jil) (the faste
 <br>
 
 ## <a name="ef-auditable-entities"></a> Auditable Entities
-Automatically update info about who and when create/modify/delete the entity during `context.SaveCahnges()`
+Automatically update info about who and when create / modify / delete the entity during `context.SaveCahnges()`
 
-Usage:
 ```cs
 class User
 {
@@ -154,7 +153,7 @@ class MyContext : DbContext
 
 Also you can track only the creation, deletion and so on by implementing the following interfaces:
 
-#### ISoftDeletable
+#### `ISoftDeletable`
 Used to standardize soft deleting entities. Soft-delete entities are not actually deleted,
 marked as `IsDeleted == true` in the database, but can not be retrieved to the application.
 
@@ -165,7 +164,7 @@ interface ISoftDeletable
 }
 ```
 
-#### ICreationTrackable
+#### `ICreationTrackable`
 An entity can implement this interface if `CreatedUtc` of this entity must be stored.
 `CreatedUtc` is automatically set when saving Entity to database.
 
@@ -176,7 +175,7 @@ interface ICreationTrackable
 }
 ```
 
-#### ICreationAuditable<TUserId>
+#### `ICreationAuditable<TUserId>`
 This interface is implemented by entities that is wanted to store creation information (who and when created).
 Creation time and creator user are automatically set when saving Entity to database.
 
@@ -193,7 +192,7 @@ interface ICreationAuditable : ICreationTrackable
 }
 ```
 
-#### IModificationTrackable
+#### `IModificationTrackable`
 An entity can implement this interface if `UpdatedUtc` of this entity must be stored.
 `UpdatedUtc` automatically set when updating the Entity.
 
@@ -204,7 +203,7 @@ interface IModificationTrackable
 }
 ```
 
-#### IModificationAuditable<TUserId>
+#### `IModificationAuditable<TUserId>`
 This interface is implemented by entities that is wanted
 to store modification information (who and when modified lastly).
 Properties are automatically set when updating the Entity.
@@ -222,7 +221,7 @@ interface IModificationAuditable : IModificationTrackable
 }
 ```
 
-#### IDeletionTrackable
+#### `IDeletionTrackable`
 An entity can implement this interface if `DeletedUtc` of this entity must be stored.
 `DeletedUtc` is automatically set when deleting Entity.
 
@@ -233,7 +232,7 @@ interface IDeletionTrackable : ISoftDeletable
 }
 ```
 
-#### IDeletionAuditable<TUserId>
+#### `IDeletionAuditable<TUserId>`
 This interface is implemented by entities which wanted to store deletion information (who and when deleted).
 
 ```cs
@@ -249,7 +248,7 @@ public interface IDeletionAuditable : IDeletionTrackable
 }
 ```
 
-#### IFullTrackable
+#### `IFullTrackable`
 This interface is implemented by entities which modification times must be tracked.
 Related properties automatically set when saving/updating/deleting Entity objects.
 
@@ -257,7 +256,7 @@ Related properties automatically set when saving/updating/deleting Entity object
 interface IFullTrackable : ICreationTrackable, IModificationTrackable, IDeletionTrackable { }
 ```
 
-#### IFullAuditable<TUserId>
+#### `IFullAuditable<TUserId>`
 This interface is implemented by entities which must be audited.
 Related properties automatically set when saving/updating/deleting Entity objects.
 
@@ -286,9 +285,10 @@ static void UpdateTrackableEntities(this DbContext context);
 
 ## <a name="ef-concurrency-checks"></a> Concurrency Checks
 By default EF and EFCore uses `EntityEntry.OriginalValues["RowVersion"]` for concurrency checks
-([see docs](https://docs.microsoft.com/en-us/ef/core/saving/concurrency)).  
-With this behaviour the concurrency conflict may occur only between `SELECT` statement
-that loads entities to the `DbContext` and `UPDATE` statement from `DbContext.SaveChanges()`.
+([see docs](https://docs.microsoft.com/en-us/ef/core/saving/concurrency)).
+
+With this behaviour the concurrency conflict may occur only between the `SELECT` statement
+that loads entities to the `DbContext` and the `UPDATE` statement from `DbContext.SaveChanges()`.
 
 But sometimes we want check concurrency conflicts between two or more edit operations that comes from client-side. For example:
 
@@ -360,13 +360,13 @@ class MyEntity : IConcurrencyCheckable<long>
 
 `RowVersion` column should be updated by trigger in DB. Example for SQLite:
 ```sql
-CREATE TABLE MyTable ( RowVersion INTEGER DEFAULT 0 );
+CREATE TABLE MyEntities ( RowVersion INTEGER DEFAULT 0 );
 
-CREATE TRIGGER TRG_MyTable_UPD
-AFTER UPDATE ON MyTable
+CREATE TRIGGER TRG_MyEntities_UPD
+AFTER UPDATE ON MyEntities
     WHEN old.RowVersion = new.RowVersion
 BEGIN
-    UPDATE MyTable
+    UPDATE MyEntities
     SET RowVersion = RowVersion + 1;
 END;
 ```
@@ -385,11 +385,11 @@ Save changes regardless of `DbUpdateConcurrencyException`.
 <br>
 
 ## <a name="ef-transaction-logs"></a> Transaction Logs
-Write all inserted / updated / deleted entities (serialized to JSON) to separete table named `TransactionLog`.
+Write all inserted / updated / deleted entities (serialized to JSON) to the separete table named `TransactionLog`.
 
 To capture transaction logs an entity must inherit from empty `ITransactionLoggable { }` interface.
 
-And the `DbContext` should overload `SaveChanges()` method with `SaveChangesWithTransactionLog()` wrapper,
+And the `DbContext` should overload `SaveChanges()` method with `SaveChangesWithTransactionLog()` wrapper,  
 and register the `TransactionLog` entity in `ModelBuilder`.
 
 ```cs
@@ -447,7 +447,7 @@ class MyCoreDbContext : DbContext
 
 ```
 
-After that the transaction logs can be accessed with `TransactionLog` entity:
+After that the transaction logs can be accessed via `TransactionLog` entity:
 
 ```cs
 class TransactionLog
@@ -499,7 +499,7 @@ Disposable token for `using(...)` statement where `DbContext.Configuration.AutoD
 // here AutoDetectChanges is enabled
 using (dbContext.WithoutChangeTracking())
 {
-    // inside this block AutoDetectChangesis disabled
+    // inside this block AutoDetectChanges is disabled
 }
 // here AutoDetectChanges is enabled again
 ```
@@ -514,7 +514,7 @@ where `DbContext.Configuration.AutoDetectChanges` is disabled.
 // here AutoDetectChanges is enabled
 using (dbContext.WithChangeTrackingOnce())
 {
-    // inside this block AutoDetectChangesis disabled
+    // inside this block AutoDetectChanges is disabled
 }
 // here AutoDetectChanges is enabled again
 ```
@@ -538,7 +538,7 @@ struct TableAndSchema
 
 <br>
 
-## <a name="ef-core-usage"></a> All together example for EntityFrameworkCore
+## <a name="ef-core-usage"></a> All together example for EntityFramework Core
 ```cs
 class MyDbContext : DbContext
 {
