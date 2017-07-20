@@ -3,8 +3,8 @@
   <metadata>
     <id>EntityFramework.ChangeTrackingExtensions</id>
     <version>1.0.0</version>
-    <summary>Audit Logging, Concurrency Checks, JSON properties and Transaction Logs for EntityFramework</summary>
-    <description>An extension for EntityFramework that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</description>
+    <summary>Auditing, Concurrency Checks, JSON properties and Transaction Logs for EntityFramework</summary>
+    <description>An extension for EntityFramework that provides Auditing, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</description>
     <authors>Dmitry Panyushkin</authors>
     <owners>gnaeus</owners>
     <projectUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions</projectUrl>
@@ -13,7 +13,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>First release</releaseNotes>
     <copyright>Copyright © Dmitry Panyushkin 2017</copyright>
-    <tags>EF EntityFramework Entity Framework ChangeTracking Change Tracking AuditLog Audit Log TransactionLog Transaction Log ComplexType Complex Type JSON</tags>
+    <tags>EF EntityFramework Entity Framework ChangeTracking Change Tracking Auditing Audit TransactionLog Transaction Log ComplexType Complex Type JSON</tags>
     <dependencies>
       <dependency id="Jil" version="2.15" />
       <dependency id="EntityFramework" version="6.1" />
