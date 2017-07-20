@@ -14,7 +14,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
             return $"{TestContext.FullyQualifiedTestClassName}.{TestContext.TestName}";
         }
 
-        protected TestDbContext CreateTestDbContext()
+        protected TestDbContext CreateInMemoryDbContext()
         {
             return new TestDbContext(GetInMemoryDbName());
         }
@@ -37,7 +37,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
         {
             _connection.Close();
 
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 context.Database.EnsureDeleted();
             }

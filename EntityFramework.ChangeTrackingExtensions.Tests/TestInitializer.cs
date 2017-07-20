@@ -88,7 +88,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
         }
 
-        protected TestDbContext CreateTestDbContext()
+        protected TestDbContext CreateInMemoryDbContext()
         {
             return CreateSqliteDbContext();
         }

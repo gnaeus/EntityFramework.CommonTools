@@ -10,7 +10,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void ShouldNotDetectChangesInsideUsingBlock()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 var user = new User();
                 context.Users.Add(user);
@@ -32,7 +32,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void ShouldDetectChangesOutsideOfUsingBlock()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 var user = new User();
                 context.Users.Add(user);
@@ -54,7 +54,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void ShouldDetectChangesOnceInsideUsingBlock()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 var first = new User();
                 var second = new User();
@@ -80,7 +80,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void ShouldDetectChangesAnyTimesOutsideOfUsingBlock()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 var first = new User();
                 var second = new User();

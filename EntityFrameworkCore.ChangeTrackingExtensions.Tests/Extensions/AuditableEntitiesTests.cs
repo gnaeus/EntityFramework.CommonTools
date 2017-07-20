@@ -18,7 +18,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestAuditableEntitiesGeneric()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 var author = new User();
                 context.Users.Add(author);

@@ -16,7 +16,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         [TestMethod]
         public void TestTrackableEntities()
         {
-            using (var context = CreateTestDbContext())
+            using (var context = CreateInMemoryDbContext())
             {
                 // insert
                 var user = new User();

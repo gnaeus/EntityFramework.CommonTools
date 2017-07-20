@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.6</TargetFramework>
     <PackageId>EntityFrameworkCore.ChangeTrackingExtensions</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
-    <Description>A plugin for Microsoft.EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</Description>
+    <Description>An extension for Microsoft.EntityFrameworkCore that provides Audit Logging, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</Description>
     <Authors>Dmitry Panyushkin</Authors>
     <PackageLicenseUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/gnaeus/EntityFramework.ChangeTrackingExtensions</PackageProjectUrl>
