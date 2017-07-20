@@ -16,7 +16,7 @@
 
 <br>
 
-### <a name="ef-json-field"></a> JSON Complex Types
+## <a name="ef-json-field"></a> JSON Complex Types
 There is an utility struct named `JsonField`, that helps to persist any Complex Type as JSON string in single table column.
 
 ```cs
@@ -111,7 +111,7 @@ Because `JsonField` uses [Jil](https://github.com/kevin-montrose/Jil) (the faste
 
 <br>
 
-### <a name="ef-auditable-entities"></a> Auditable Entities
+## <a name="ef-auditable-entities"></a> Auditable Entities
 Automatically update info about who and when create/modify/delete the entity during `context.SaveCahnges()`
 
 Usage:
@@ -154,16 +154,20 @@ class MyContext : DbContext
 
 Also you can track only the creation, deletion and so on by implementing the following interfaces:
 
+#### ISoftDeletable
+Used to standardize soft deleting entities. Soft-delete entities are not actually deleted,
+marked as `IsDeleted == true` in the database, but can not be retrieved to the application.
+
 ```cs
 interface ISoftDeletable
 {
     bool IsDeleted { get; set; }
 }
 ```
-Used to standardize soft deleting entities. Soft-delete entities are not actually deleted,
-marked as `IsDeleted == true` in the database, but can not be retrieved to the application.
 
-<br>
+#### ICreationTrackable
+An entity can implement this interface if `CreatedUtc` of this entity must be stored.
+`CreatedUtc` is automatically set when saving Entity to database.
 
 ```cs
 interface ICreationTrackable
@@ -171,10 +175,10 @@ interface ICreationTrackable
     DateTime CreatedUtc { get; set; }
 }
 ```
-An entity can implement this interface if `CreatedUtc` of this entity must be stored.
-`CreatedUtc` is automatically set when saving Entity to database.
 
-<br>
+#### ICreationAuditable<TUserId>
+This interface is implemented by entities that is wanted to store creation information (who and when created).
+Creation time and creator user are automatically set when saving Entity to database.
 
 ```cs
 interface ICreationAuditable<TUserId> : ICreationTrackable
@@ -188,10 +192,10 @@ interface ICreationAuditable : ICreationTrackable
     string CreatorUser { get; set; }
 }
 ```
-This interface is implemented by entities that is wanted to store creation information (who and when created).
-Creation time and creator user are automatically set when saving Entity to database.
 
-<br>
+#### IModificationTrackable
+An entity can implement this interface if `UpdatedUtc` of this entity must be stored.
+`UpdatedUtc` automatically set when updating the Entity.
 
 ```cs
 interface IModificationTrackable
@@ -199,10 +203,11 @@ interface IModificationTrackable
     DateTime? UpdatedUtc { get; set; }
 }
 ```
-An entity can implement this interface if `UpdatedUtc` of this entity must be stored.
-`UpdatedUtc` automatically set when updating the Entity.
 
-<br>
+#### IModificationAuditable<TUserId>
+This interface is implemented by entities that is wanted
+to store modification information (who and when modified lastly).
+Properties are automatically set when updating the Entity.
 
 ```cs
 interface IModificationAuditable<TUserId> : IModificationTrackable
@@ -216,11 +221,10 @@ interface IModificationAuditable : IModificationTrackable
     string UpdaterUser { get; set; }
 }
 ```
-This interface is implemented by entities that is wanted
-to store modification information (who and when modified lastly).
-Properties are automatically set when updating the Entity.
 
-<br>
+#### IDeletionTrackable
+An entity can implement this interface if `DeletedUtc` of this entity must be stored.
+`DeletedUtc` is automatically set when deleting Entity.
 
 ```cs
 interface IDeletionTrackable : ISoftDeletable
@@ -228,10 +232,9 @@ interface IDeletionTrackable : ISoftDeletable
     DateTime? DeletedUtc { get; set; }
 }
 ```
-An entity can implement this interface if `DeletedUtc` of this entity must be stored.
-`DeletedUtc` is automatically set when deleting Entity.
 
-<br>
+#### IDeletionAuditable<TUserId>
+This interface is implemented by entities which wanted to store deletion information (who and when deleted).
 
 ```cs
 public interface IDeletionAuditable<TUserId> : IDeletionTrackable
@@ -245,17 +248,18 @@ public interface IDeletionAuditable : IDeletionTrackable
     string DeleterUser { get; set; }
 }
 ```
-This interface is implemented by entities which wanted to store deletion information (who and when deleted).
 
-<br>
+#### IFullTrackable
+This interface is implemented by entities which modification times must be tracked.
+Related properties automatically set when saving/updating/deleting Entity objects.
 
 ```cs
 interface IFullTrackable : ICreationTrackable, IModificationTrackable, IDeletionTrackable { }
 ```
-This interface is implemented by entities which modification times must be tracked.
-Related properties automatically set when saving/updating/deleting Entity objects.
 
-<br>
+#### IFullAuditable<TUserId>
+This interface is implemented by entities which must be audited.
+Related properties automatically set when saving/updating/deleting Entity objects.
 
 ```cs
 interface IFullAuditable<TUserId> : IFullTrackable,
@@ -264,8 +268,6 @@ interface IFullAuditable<TUserId> : IFullTrackable,
 // or
 interface IFullAuditable : IFullTrackable, ICreationAuditable, IModificationAuditable, IDeletionAuditable { }
 ```
-This interface is implemented by entities which must be audited.
-Related properties automatically set when saving/updating/deleting Entity objects.
 
 <br>
 
@@ -282,7 +284,7 @@ static void UpdateTrackableEntities(this DbContext context);
 
 <br>
 
-### <a name="ef-concurrency-checks"></a> Concurrency Checks
+## <a name="ef-concurrency-checks"></a> Concurrency Checks
 By default EF and EFCore uses `EntityEntry.OriginalValues["RowVersion"]` for concurrency checks
 ([see docs](https://docs.microsoft.com/en-us/ef/core/saving/concurrency)).  
 With this behaviour the concurrency conflict may occur only between `SELECT` statement
@@ -290,10 +292,10 @@ that loads entities to the `DbContext` and `UPDATE` statement from `DbContext.Sa
 
 But sometimes we want check concurrency conflicts between two or more edit operations that comes from client-side. For example:
 
-* User1 loads the editor form
-* User2 loads the same editor form
-* User1 saves his changes
-* User2 saves his changes __and gets concurrency conflict__.
+* user_1 loads the editor form
+* user_2 loads the same editor form
+* user_1 saves his changes
+* user_2 saves his changes __and gets concurrency conflict__.
 
 To provide this behaviour, an entity should implement the following interface:
 ```cs
@@ -319,6 +321,10 @@ class MyDbContext : DbContext
 There are also three different behaviours for `IConcurrencyCheckable<T>`:
 
 #### `IConcurrencyCheckable<byte[]>`
+`RowVersion` property should be decorated by `[Timestamp]` attribute.  
+`RowVersion` column should have `ROWVERSION` type in SQL Server.  
+The default behaviour. Supported only by Microsoft SQL Server.
+
 ```cs
 class MyEntity : IConcurrencyCheckable<Guid>
 {
@@ -326,13 +332,12 @@ class MyEntity : IConcurrencyCheckable<Guid>
     public byte[] RowVersion { get; set; }
 }
 ```
-`RowVersion` property should be decorated by `[Timestamp]` attribute.  
-`RowVersion` column should have `ROWVERSION` type in SQL Server.  
-The default behaviour. Supported only by Microsoft SQL Server.
-
-<br>
 
 #### `IConcurrencyCheckable<Guid>`
+`RowVersion` property should be decorated by `[ConcurrencyCheck]` attribute.  
+It's value is populated by `Guid.NewGuid()` during each `DbContext.SaveChanges()` call at client-side.  
+No specific database support is needed.
+
 ```cs
 class MyEntity : IConcurrencyCheckable<Guid>
 {
@@ -340,13 +345,10 @@ class MyEntity : IConcurrencyCheckable<Guid>
     public Guid RowVersion { get; set; }
 }
 ```
-`RowVersion` property should be decorated by `[ConcurrencyCheck]` attribute.  
-It's value is populated by `Guid.NewGuid()` during each `DbContext.SaveChanges()` call at client-side.  
-No specific database support is needed.
-
-<br>
 
 #### `IConcurrencyCheckable<long>`
+`RowVersion` property should be decorated by `[ConcurrencyCheck]` and `[DatabaseGenerated(DatabaseGeneratedOption.Computed)]` attributes.
+
 ```cs
 class MyEntity : IConcurrencyCheckable<long>
 {
@@ -355,7 +357,7 @@ class MyEntity : IConcurrencyCheckable<long>
     public long RowVersion { get; set; }
 }
 ```
-`RowVersion` property should be decorated by `[ConcurrencyCheck]` and `[DatabaseGenerated(DatabaseGeneratedOption.Computed)]` attributes.  
+
 `RowVersion` column should be updated by trigger in DB. Example for SQLite:
 ```sql
 CREATE TABLE MyTable ( RowVersion INTEGER DEFAULT 0 );
@@ -369,17 +371,27 @@ BEGIN
 END;
 ```
 
-# TODO : Ignore Concurrency
+<br>
+
+But sometimes we want to ignore `DbUpdateConcurrencyException`.
+And there are two extension methods for this.
+
+__`static void SaveChangesIgnoreConcurrency(this DbContext dbContext, int retryCount = 3)`__  
+Save changes regardless of `DbUpdateConcurrencyException`.
+
+__`static async Task SaveChangesIgnoreConcurrencyAsync(this DbContext dbContext, int retryCount = 3)`__  
+Save changes regardless of `DbUpdateConcurrencyException`.
 
 <br>
 
-### <a name="ef-transaction-logs"></a> Transaction Logs
+## <a name="ef-transaction-logs"></a> Transaction Logs
 Write all inserted / updated / deleted entities (serialized to JSON) to separete table named `TransactionLog`.
 
 To capture transaction logs an entity must inherit from empty `ITransactionLoggable { }` interface.
 
 And the `DbContext` should overload `SaveChanges()` method with `SaveChangesWithTransactionLog()` wrapper,
 and register the `TransactionLog` entity in `ModelBuilder`.
+
 ```cs
 class Post : ITransactionLoggable
 {
@@ -436,6 +448,7 @@ class MyCoreDbContext : DbContext
 ```
 
 After that the transaction logs can be accessed with `TransactionLog` entity:
+
 ```cs
 class TransactionLog
 {
@@ -477,7 +490,7 @@ class TransactionLog
 
 <br>
 
-### <a name="ef-6-only"></a> DbContext Extensions (EF 6 only)
+## <a name="ef-6-only"></a> DbContext Extensions (EF 6 only)
 
 __`static IDisposable WithoutChangeTracking(this DbContext dbContext)`__  
 Disposable token for `using(...)` statement where `DbContext.Configuration.AutoDetectChanges` is disabled.
@@ -525,7 +538,7 @@ struct TableAndSchema
 
 <br>
 
-### <a name="ef-core-usage"></a> All together example for EntityFrameworkCore
+## <a name="ef-core-usage"></a> All together example for EntityFrameworkCore
 ```cs
 class MyDbContext : DbContext
 {
@@ -572,7 +585,7 @@ class MyDbContext : DbContext
 
 <br>
 
-### <a name="ef-6-usage"></a> All together example for EntityFramework 6
+## <a name="ef-6-usage"></a> All together example for EntityFramework 6
 ```cs
 class MyDbContext : DbContext
 {

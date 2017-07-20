@@ -77,6 +77,7 @@ namespace EntityFramework.ChangeTrackingExtensions
         /// Save changes regardless of <see cref="DbUpdateConcurrencyException"/>.
         /// http://msdn.microsoft.com/en-us/data/jj592904.aspx
         /// </summary>
+        /// <exception cref="DbUpdateConcurrencyException" />
         public static void SaveChangesIgnoreConcurrency(
             this DbContext dbContext, int retryCount = 3)
         {
@@ -107,6 +108,7 @@ namespace EntityFramework.ChangeTrackingExtensions
         /// Save changes regardless of <see cref="DbUpdateConcurrencyException"/>.
         /// http://msdn.microsoft.com/en-us/data/jj592904.aspx
         /// </summary>
+        /// <exception cref="DbUpdateConcurrencyException" />
         public static async Task SaveChangesIgnoreConcurrencyAsync(
             this DbContext dbContext, int retryCount = 3)
         {
