@@ -14,17 +14,17 @@ namespace EntityFramework.ChangeTrackingExtensions
     {
         readonly Lazy<Func<T, bool>> _lazyFunc;
 
-        protected Expression<Func<T, bool>> Expression;
+        protected Expression<Func<T, bool>> Predicate;
 
         protected Specification()
         {
-            _lazyFunc = new Lazy<Func<T, bool>>(() => Expression.Compile());
+            _lazyFunc = new Lazy<Func<T, bool>>(() => Predicate.Compile());
         }
 
-        public Specification(Expression<Func<T, bool>> expression)
+        public Specification(Expression<Func<T, bool>> predicate)
             : this()
         {
-            Expression = expression;
+            Predicate = predicate;
         }
 
         public bool IsSatisfiedBy(T entity)
@@ -32,25 +32,25 @@ namespace EntityFramework.ChangeTrackingExtensions
             return _lazyFunc.Value.Invoke(entity);
         }
 
-        public static implicit operator Specification<T>(Expression<Func<T, bool>> expression)
+        public static implicit operator Func<T, bool>(Specification<T> specification)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (specification == null) throw new ArgumentNullException(nameof(specification));
 
-            return new Specification<T>(expression);
+            return specification._lazyFunc.Value;
         }
 
         public static implicit operator Expression<Func<T, bool>>(Specification<T> specification)
         {
             if (specification == null) throw new ArgumentNullException(nameof(specification));
 
-            return specification.Expression;
+            return specification.Predicate;
         }
 
-        public static implicit operator Func<T, bool>(Specification<T> specification)
+        public static implicit operator Specification<T>(Expression<Func<T, bool>> predicate)
         {
-            if (specification == null) throw new ArgumentNullException(nameof(specification));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return specification._lazyFunc.Value;
+            return new Specification<T>(predicate);
         }
 
         public static bool operator true(Specification<T> specification)
@@ -66,32 +66,32 @@ namespace EntityFramework.ChangeTrackingExtensions
         public static Specification<T> operator !(Specification<T> specification)
         {
             return new Specification<T>(
-                System.Linq.Expressions.Expression.Lambda<Func<T, bool>>(
-                    System.Linq.Expressions.Expression.Not(specification.Expression.Body),
-                    specification.Expression.Parameters));
+                Expression.Lambda<Func<T, bool>>(
+                    Expression.Not(specification.Predicate.Body),
+                    specification.Predicate.Parameters));
         }
 
         public static Specification<T> operator &(Specification<T> left, Specification<T> right)
         {
-            ParameterExpression parameter = left.Expression.Parameters[0];
+            ParameterExpression parameter = left.Predicate.Parameters[0];
 
             return new Specification<T>(
-                System.Linq.Expressions.Expression.Lambda<Func<T, bool>>(
-                    System.Linq.Expressions.Expression.AndAlso(
-                        left.Expression.Body,
-                        new ParameterReplacer(parameter).Visit(right.Expression.Body)),
+                Expression.Lambda<Func<T, bool>>(
+                    Expression.AndAlso(
+                        left.Predicate.Body,
+                        new ParameterReplacer(parameter).Visit(right.Predicate.Body)),
                     parameter));
         }
 
         public static Specification<T> operator |(Specification<T> left, Specification<T> right)
         {
-            ParameterExpression parameter = left.Expression.Parameters[0];
+            ParameterExpression parameter = left.Predicate.Parameters[0];
 
             return new Specification<T>(
-                System.Linq.Expressions.Expression.Lambda<Func<T, bool>>(
-                    System.Linq.Expressions.Expression.OrElse(
-                        left.Expression.Body,
-                        new ParameterReplacer(parameter).Visit(right.Expression.Body)),
+                Expression.Lambda<Func<T, bool>>(
+                    Expression.OrElse(
+                        left.Predicate.Body,
+                        new ParameterReplacer(parameter).Visit(right.Predicate.Body)),
                     parameter));
         }
     }
