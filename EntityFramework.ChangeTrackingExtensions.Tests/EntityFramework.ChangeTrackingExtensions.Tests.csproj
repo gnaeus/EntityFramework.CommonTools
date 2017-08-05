@@ -86,7 +86,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\EntityFramework.ChangeTrackingExtensions\EntityFramework.ChangeTrackingExtensions.csproj">
       <Project>{1760a172-08a0-4232-b507-55e08971e87d}</Project>
