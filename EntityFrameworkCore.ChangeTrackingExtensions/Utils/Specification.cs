@@ -1,15 +1,22 @@
 ﻿#if EF_CORE
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions
 #else
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {
+    /// <summary>
+    /// Implementation of Specification pattren,
+    /// that can be used with <see cref="IQueryable{T}"/> expressions.
+    /// https://en.wikipedia.org/wiki/Specification_pattern
+    /// </summary>
     public class Specification<T>
     {
         readonly Lazy<Func<T, bool>> _lazyFunc;
@@ -32,18 +39,18 @@ namespace EntityFramework.ChangeTrackingExtensions
             return _lazyFunc.Value.Invoke(entity);
         }
 
-        public static implicit operator Func<T, bool>(Specification<T> specification)
+        public static implicit operator Func<T, bool>(Specification<T> spec)
         {
-            if (specification == null) throw new ArgumentNullException(nameof(specification));
+            if (spec == null) throw new ArgumentNullException(nameof(spec));
 
-            return specification._lazyFunc.Value;
+            return spec._lazyFunc.Value;
         }
 
-        public static implicit operator Expression<Func<T, bool>>(Specification<T> specification)
+        public static implicit operator Expression<Func<T, bool>>(Specification<T> spec)
         {
-            if (specification == null) throw new ArgumentNullException(nameof(specification));
+            if (spec == null) throw new ArgumentNullException(nameof(spec));
 
-            return specification.Predicate;
+            return spec.Predicate;
         }
 
         public static implicit operator Specification<T>(Expression<Func<T, bool>> predicate)
@@ -53,26 +60,39 @@ namespace EntityFramework.ChangeTrackingExtensions
             return new Specification<T>(predicate);
         }
 
-        public static bool operator true(Specification<T> specification)
+        /// <remarks>
+        /// For user-defined conditional logical operators.
+        /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
+        /// </remarks>
+        public static bool operator true(Specification<T> spec)
         {
             return false;
         }
 
-        public static bool operator false(Specification<T> specification)
+        /// <remarks>
+        /// For user-defined conditional logical operators.
+        /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
+        /// </remarks>
+        public static bool operator false(Specification<T> spec)
         {
             return false;
         }
 
-        public static Specification<T> operator !(Specification<T> specification)
+        public static Specification<T> operator !(Specification<T> spec)
         {
+            if (spec == null) throw new ArgumentNullException(nameof(spec));
+
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
-                    Expression.Not(specification.Predicate.Body),
-                    specification.Predicate.Parameters));
+                    Expression.Not(spec.Predicate.Body),
+                    spec.Predicate.Parameters));
         }
 
         public static Specification<T> operator &(Specification<T> left, Specification<T> right)
         {
+            if (left == null) throw new ArgumentNullException(nameof(left));
+            if (right == null) throw new ArgumentNullException(nameof(right));
+
             ParameterExpression parameter = left.Predicate.Parameters[0];
 
             return new Specification<T>(
@@ -85,6 +105,9 @@ namespace EntityFramework.ChangeTrackingExtensions
 
         public static Specification<T> operator |(Specification<T> left, Specification<T> right)
         {
+            if (left == null) throw new ArgumentNullException(nameof(left));
+            if (right == null) throw new ArgumentNullException(nameof(right));
+
             ParameterExpression parameter = left.Predicate.Parameters[0];
 
             return new Specification<T>(
