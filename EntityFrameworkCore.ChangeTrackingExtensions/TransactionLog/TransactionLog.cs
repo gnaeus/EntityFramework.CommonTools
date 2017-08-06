@@ -33,12 +33,12 @@ namespace EntityFramework.ChangeTrackingExtensions
         public long Id { get; set; }
 
         /// <summary>
-        /// An ID of all changes that captured during single <see cref="DbContext.SaveChanges"/> call.
+        /// An ID of all changes that captured during single <see cref="DbContext.SaveChanges()"/> call.
         /// </summary>
         public Guid TransactionId { get; set; }
 
         /// <summary>
-        /// UTC timestamp of <see cref="DbContext.SaveChanges"/> call.
+        /// UTC timestamp of <see cref="DbContext.SaveChanges()"/> call.
         /// </summary>
         public DateTime CreatedUtc { get; set; }
 

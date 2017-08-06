@@ -27,40 +27,7 @@ namespace EntityFramework.ChangeTrackingExtensions
 
 namespace QueryableExtensions
 #endif
-{
-    public static partial class QueryableExtensions
-    {
-        /// <summary>
-        /// Wrap <see cref="IQueryable{T}"/> to decorator that intercepts
-        /// IQueryable.Expression with provided <see cref="ExpressionVisitor"/>.
-        /// </summary>
-        public static IQueryable<T> AsVisitable<T>(this IQueryable<T> queryable, ExpressionVisitor visitor)
-        {
-            if (queryable == null) throw new ArgumentNullException(nameof(queryable));
-            if (visitor == null) throw new ArgumentNullException(nameof(visitor));
-
-            Type visitorType = visitor.GetType();
-            IQueryable<T> innerQuery = queryable;
-
-            while (true)
-            {
-                var visitableQuery = innerQuery as VisitableQuery<T>;
-
-                if (visitableQuery == null)
-                {
-                    return VisitableQueryFactory<T>.Create(queryable, visitor);
-                }
-                
-                if (visitableQuery.Visitor.GetType() == visitorType)
-                {
-                    return queryable;
-                }
-
-                innerQuery = visitableQuery.InnerQuery;
-            }
-        }
-    }
-    
+{   
     /// <summary>
     /// An <see cref="IQueryable{T}"/> wrapper that allows us to visit
     /// the query's expression tree just before LINQ to SQL gets to it.
@@ -110,8 +77,8 @@ namespace QueryableExtensions
 #if EF_CORE
         IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
         {
-            return (_inner as IAsyncEnumerable<T>)?.GetEnumerator()
-                ?? (_inner as IAsyncEnumerableAccessor<T>)?.AsyncEnumerable.GetEnumerator();
+            return (_queryable as IAsyncEnumerable<T>)?.GetEnumerator()
+                ?? (_queryable as IAsyncEnumerableAccessor<T>)?.AsyncEnumerable.GetEnumerator();
         }
 #elif EF_6
         public IDbAsyncEnumerator<T> GetAsyncEnumerator()
