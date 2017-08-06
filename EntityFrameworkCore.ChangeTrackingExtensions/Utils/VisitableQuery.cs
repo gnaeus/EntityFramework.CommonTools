@@ -1,10 +1,8 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+﻿// The MIT License
 // Based on https://github.com/scottksmith95/LINQKit
 // Original work: Copyright (c) 2007-2009 Joseph Albahari, Tomas Petricek
 //                Copyright (c) 2013-2017 Scott Smith, Stef Heyenrath, Tuomas Hietanen
-//
 // Modified work: Copyright (c) 2017 Dmitry Panyushkin
-///////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Collections.Generic;
@@ -32,31 +30,33 @@ namespace QueryableExtensions
 {
     public static partial class QueryableExtensions
     {
-        // TODO: review this
+        /// <summary>
+        /// Wrap <see cref="IQueryable{T}"/> to decorator that intercepts
+        /// IQueryable.Expression with provided <see cref="ExpressionVisitor"/>.
+        /// </summary>
         public static IQueryable<T> AsVisitable<T>(this IQueryable<T> queryable, ExpressionVisitor visitor)
         {
             if (queryable == null) throw new ArgumentNullException(nameof(queryable));
             if (visitor == null) throw new ArgumentNullException(nameof(visitor));
 
             Type visitorType = visitor.GetType();
-
             IQueryable<T> innerQuery = queryable;
 
             while (true)
             {
-                var visitable = innerQuery as VisitableQuery<T>;
+                var visitableQuery = innerQuery as VisitableQuery<T>;
 
-                if (visitable == null)
+                if (visitableQuery == null)
                 {
                     return VisitableQueryFactory<T>.Create(queryable, visitor);
                 }
                 
-                if (visitorType.IsAssignableFrom(visitable.Visitor.GetType()))
+                if (visitableQuery.Visitor.GetType() == visitorType)
                 {
-                    return visitable;
+                    return queryable;
                 }
 
-                innerQuery = visitable.InnerQuery;
+                innerQuery = visitableQuery.InnerQuery;
             }
         }
     }

@@ -1,23 +1,30 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
 
+#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions
+#else
+namespace QueryableExtensions
 #endif
 {
     /// <summary>
-    /// Implementation of Specification pattren,
-    /// that can be used with <see cref="IQueryable{T}"/> expressions.
-    /// https://en.wikipedia.org/wiki/Specification_pattern
+    /// Specification pattren https://en.wikipedia.org/wiki/Specification_pattern.
     /// </summary>
-    public class Specification<T>
+    /// <typeparam name="T"></typeparam>
+    public interface ISpecification<T>
+    {
+        bool IsSatisfiedBy(T entity);
+
+        Expression<Func<T, bool>> ToExpression();
+    }
+
+    /// <summary>
+    /// Implementation of Specification pattren, that can be used with <see cref="IQueryable{T}"/> expressions.
+    /// </summary>
+    public class Specification<T> : ISpecification<T>
     {
         readonly Lazy<Func<T, bool>> _lazyFunc;
 
@@ -25,7 +32,7 @@ namespace EntityFramework.ChangeTrackingExtensions
 
         protected Specification()
         {
-            _lazyFunc = new Lazy<Func<T, bool>>(() => Predicate.Compile());
+            _lazyFunc = new Lazy<Func<T, bool>>(() => ToExpression().Compile());
         }
 
         public Specification(Expression<Func<T, bool>> predicate)
@@ -34,23 +41,21 @@ namespace EntityFramework.ChangeTrackingExtensions
             Predicate = predicate;
         }
 
-        public bool IsSatisfiedBy(T entity)
+        public virtual bool IsSatisfiedBy(T entity)
         {
             return _lazyFunc.Value.Invoke(entity);
         }
 
-        public static implicit operator Func<T, bool>(Specification<T> spec)
+        public virtual Expression<Func<T, bool>> ToExpression()
         {
-            if (spec == null) throw new ArgumentNullException(nameof(spec));
-
-            return spec._lazyFunc.Value;
+            return Predicate;
         }
 
         public static implicit operator Expression<Func<T, bool>>(Specification<T> spec)
         {
             if (spec == null) throw new ArgumentNullException(nameof(spec));
 
-            return spec.Predicate;
+            return spec.ToExpression();
         }
 
         public static implicit operator Specification<T>(Expression<Func<T, bool>> predicate)
@@ -84,8 +89,8 @@ namespace EntityFramework.ChangeTrackingExtensions
 
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
-                    Expression.Not(spec.Predicate.Body),
-                    spec.Predicate.Parameters));
+                    Expression.Not(spec.ToExpression().Body),
+                    spec.ToExpression().Parameters));
         }
 
         public static Specification<T> operator &(Specification<T> left, Specification<T> right)
@@ -93,13 +98,13 @@ namespace EntityFramework.ChangeTrackingExtensions
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            ParameterExpression parameter = left.Predicate.Parameters[0];
+            ParameterExpression parameter = left.ToExpression().Parameters[0];
 
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
                     Expression.AndAlso(
-                        left.Predicate.Body,
-                        new ParameterReplacer(parameter).Visit(right.Predicate.Body)),
+                        left.ToExpression().Body,
+                        new ParameterReplacer(parameter).Visit(right.ToExpression().Body)),
                     parameter));
         }
 
@@ -108,13 +113,13 @@ namespace EntityFramework.ChangeTrackingExtensions
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            ParameterExpression parameter = left.Predicate.Parameters[0];
+            ParameterExpression parameter = left.ToExpression().Parameters[0];
 
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
                     Expression.OrElse(
-                        left.Predicate.Body,
-                        new ParameterReplacer(parameter).Visit(right.Predicate.Body)),
+                        left.ToExpression().Body,
+                        new ParameterReplacer(parameter).Visit(right.ToExpression().Body)),
                     parameter));
         }
     }
