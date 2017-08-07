@@ -17,7 +17,10 @@ namespace QueryableExtensions
 
     public static partial class QueryableExtensions
     {
-        public static IQueryable<T> AsExtendable<T>(this IQueryable<T> queryable)
+        /// <summary>
+        /// Expand all <see cref="IQueryable{T}"/> extension methods that marked by <see cref="ExpandableAttribute"/>.
+        /// </summary>
+        public static IQueryable<T> AsExpandable<T>(this IQueryable<T> queryable)
         {
             return queryable.AsVisitable(new ExpandExtensionsVisitor());
         }

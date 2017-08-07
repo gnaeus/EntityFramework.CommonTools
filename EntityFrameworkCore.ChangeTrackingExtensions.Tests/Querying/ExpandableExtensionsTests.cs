@@ -19,42 +19,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif
 {
-    public static class Extensions
+    public static class Q
     {
-        public static IQueryable<Post> FilterActive(this IEnumerable<Post> posts)
-        {
-            return posts.Filter(p => p.Title == "123").Filter(p => !p.IsDeleted);
-        }
-
-        public static IQueryable<User> FilterActive(this IEnumerable<User> users)
-        {
-            return users.Filter(u => u.Posts.FilterActive().Any());
-        }
-
-        public static IQueryable<User> FilterByLogin(this IQueryable<User> queryable, string login, int id)
-        {
-            return queryable.Where(u => u.Login == login && u.Id == id);
-        }
-    }
-
-    public static class QueryableExtensions
-    {
-        public static IQueryable<T> Filter<T>(this IEnumerable<T> enumerable, Expression<Func<T, bool>> predicate)
-        {
-            IQueryable<T> queryable = enumerable.AsQueryable();
-
-            Expression expression = new ExtensionMethodVisitor().Visit(predicate);
-
-            return queryable.Where((Expression<Func<T, bool>>)expression);
-        }
-
-        private class ExtensionMethodVisitor : ExpressionVisitor
+        private class ExtensionMethodVisitor : System.Linq.Expressions.ExpressionVisitor
         {
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 MethodInfo method = node.Method;
 
-                if (method.IsStatic && method.Name.StartsWith(nameof(Filter)))
+                if (method.IsStatic && method.Name.StartsWith("Filter"))
                 {
                     Type queryableType = method.GetParameters().First().ParameterType;
 
@@ -100,7 +73,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
         }
 
-        private class SourceReplacementVisitor : ExpressionVisitor
+        private class SourceReplacementVisitor : System.Linq.Expressions.ExpressionVisitor
         {
             readonly Expression _replacementArg;
 
@@ -124,8 +97,75 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         }
     }
 
+    public static class UserQueryableExtensions
+    {
+        [Expandable]
+        public static IQueryable<User> FilterIsActive(this IEnumerable<User> users)
+        {
+            return users.AsQueryable().Where(u => !u.IsDeleted);
+        }
+
+        [Expandable]
+        public static IQueryable<User> FilterByLogin(this IEnumerable<User> users, string login)
+        {
+            return users.AsQueryable().FilterIsActive().Where(u => u.Login == login);
+        }
+    }
+
+    public static class PostQueryableExtensions
+    {
+        [Expandable]
+        public static IQueryable<Post> FilterIsActive(this IEnumerable<Post> posts)
+        {
+            return posts.AsQueryable().Where(p => !p.IsDeleted);
+        }
+
+        [Expandable]
+        public static IQueryable<Post> FilterToday(this IEnumerable<Post> posts, int limit = 10)
+        {
+            DateTime today = DateTime.UtcNow.Date;
+
+            return posts.AsQueryable().FilterIsActive().Where(p => p.CreatedUtc > today).Take(limit);
+        }
+
+        [Expandable]
+        public static IQueryable<Post> FilterByEditor(this IEnumerable<Post> posts, int editorId)
+        {
+            return posts.AsQueryable().Where(p => p.UpdaterUserId == editorId);
+        }
+    }
+
     [TestClass]
     public class ExpandableExtensionsTests : TestInitializer
     {
+        [TestMethod]
+        public void Test()
+        {
+            using (var context = CreateSqliteDbContext())
+            {
+                context.Users.AddRange(new[]
+                {
+                    new User { Login = "admin", IsDeleted = false },
+                    new User { Login = "admin", IsDeleted = true },
+                });
+
+                context.SaveChanges();
+
+                int postsLimit = 5;
+
+                context.Users.AsExpandable()
+                    .FilterByLogin("admin")
+                    .Select(u => new
+                    {
+                        User = u,
+                        Posts = u.Posts
+                            .FilterByEditor(1)
+                            .FilterByEditor(u.Id)
+                            .FilterByEditor(u.Id + 1)
+                            .FilterToday(postsLimit)
+                            .ToList(),
+                    });
+            }
+        }
     }
 }

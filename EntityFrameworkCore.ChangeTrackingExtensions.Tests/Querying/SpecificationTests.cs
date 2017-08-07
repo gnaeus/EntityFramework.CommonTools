@@ -157,7 +157,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 var andSpec = new UserAndSpec("admin");
                 
-                context.Users.AsExtendable()
+                context.Users.AsExpandable()
                     .GroupBy(u => u.Login)
                     .Where(g => g.Count(andSpec) == 1)
                     .Single();
@@ -180,7 +180,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 var activeSpec = new UserActiveSpec();
                 var adminSpec = new UserByLoginSpec("admin");
 
-                context.Users.AsExtendable()
+                context.Users.AsExpandable()
                     .GroupBy(u => u.Login)
                     .Where(g => g.Count(activeSpec && adminSpec) == 1)
                     .Single();
@@ -202,7 +202,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 string login = "admin";
 
-                context.Users.AsExtendable()
+                context.Users.AsExpandable()
                     .GroupBy(u => u.Login)
                     .Where(g => g.Count(new UserAndSpec(login)) == 1)
                     .Single();
@@ -222,7 +222,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 context.SaveChanges();
 
-                context.Users.AsExtendable()
+                context.Users.AsExpandable()
                     .GroupBy(u => u.Login)
                     .Where(g => g.Count(!new UserAndSpec(g.Key)) == 0)
                     .Single();
