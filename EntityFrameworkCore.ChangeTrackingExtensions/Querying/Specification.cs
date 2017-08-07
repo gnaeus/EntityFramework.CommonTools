@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -24,6 +25,7 @@ namespace QueryableExtensions
     /// <summary>
     /// Implementation of Specification pattren, that can be used with <see cref="IQueryable{T}"/> expressions.
     /// </summary>
+    [DebuggerDisplay("{Predicate}")]
     public class Specification<T> : ISpecification<T>
     {
         readonly Lazy<Func<T, bool>> _lazyFunc;
@@ -51,6 +53,13 @@ namespace QueryableExtensions
             return Predicate;
         }
 
+        public static implicit operator Func<T, bool>(Specification<T> spec)
+        {
+            if (spec == null) throw new ArgumentNullException(nameof(spec));
+
+            return spec._lazyFunc.Value;
+        }
+
         public static implicit operator Expression<Func<T, bool>>(Specification<T> spec)
         {
             if (spec == null) throw new ArgumentNullException(nameof(spec));
@@ -64,7 +73,7 @@ namespace QueryableExtensions
 
             return new Specification<T>(predicate);
         }
-
+        
         /// <remarks>
         /// For user-defined conditional logical operators.
         /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
