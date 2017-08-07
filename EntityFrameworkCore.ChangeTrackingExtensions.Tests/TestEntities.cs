@@ -30,6 +30,9 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
         public DateTime CreatedUtc { get; set; }
         public DateTime? UpdatedUtc { get; set; }
         public DateTime? DeletedUtc { get; set; }
+
+        [InverseProperty(nameof(Post.Author))]
+        public virtual ICollection<Post> Posts { get; set; } = new HashSet<Post>();
     }
 
     public class Post : Entity, IFullAuditable<int>, IConcurrencyCheckable<Guid>, ITransactionLoggable
