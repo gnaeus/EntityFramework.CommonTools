@@ -106,7 +106,9 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 var expected = context.Users
                     .AsVisitable(new SpecificationExpander())
                     .Select(u => u.Posts.Where(p => p.Title == title));
+
                 Assert.AreEqual(expected.ToString(), query.ToString());
+
                 Assert.IsNotNull(query.Single());
             }
         }

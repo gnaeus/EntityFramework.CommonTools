@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,10 +25,73 @@ namespace QueryableExtensions
             if (method.IsDefined(typeof(ExtensionAttribute), true)
                 && method.IsDefined(typeof(ExpandableAttribute), true))
             {
-                return base.VisitMethodCall(node);
+                ParameterInfo[] methodParams = method.GetParameters();
+                Type queryableType = methodParams.First().ParameterType;
+                Type entityType = queryableType.GetGenericArguments().Single();
+                
+                object inputQueryable = MakeInputQueryable(entityType);
+
+                var arguments = new object[methodParams.Length];
+
+                arguments[0] = inputQueryable;
+
+                var paramReplacements = new List<KeyValuePair<string, Expression>>();
+
+                for (int i = 1; i < methodParams.Length; i++)
+                {
+                    try
+                    {
+                        arguments[i] = GetValue(node.Arguments[i]);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        ParameterInfo paramInfo = methodParams[i];
+                        Type paramType = paramInfo.GetType();
+                        
+                        arguments[i] = paramType.GetTypeInfo().IsValueType
+                            ? Activator.CreateInstance(paramType) : null;
+
+                        paramReplacements.Add(
+                            new KeyValuePair<string, Expression>(paramInfo.Name, node.Arguments[i]));
+                    }
+                }
+
+                object outputQueryable = method.Invoke(null, arguments);
+
+                Expression expression = ((IQueryable)outputQueryable).Expression;
+
+                Expression sourceQueryable = node.Arguments[0];
+
+                if (!typeof(IQueryable).IsAssignableFrom(sourceQueryable.Type))
+                {
+                    MethodInfo asQueryable = _asQueryable.MakeGenericMethod(entityType);
+
+                    sourceQueryable = Expression.Call(asQueryable, sourceQueryable);
+                }
+                
+                var rebinder = new ExtensionRebinder(inputQueryable, sourceQueryable, paramReplacements);
+                
+                return Visit(rebinder.Visit(expression));
             }
             
             return base.VisitMethodCall(node);
+        }
+        
+        private static object MakeInputQueryable(Type entityType)
+        {
+            return _makeEmptyQueryable.MakeGenericMethod(entityType).Invoke(null, null);
+        }
+
+        private static readonly MethodInfo _makeEmptyQueryable = (typeof(ExtensionExpander))
+            .GetMethod(nameof(MakeEmptyQueryable), BindingFlags.Static | BindingFlags.NonPublic);
+
+        private static readonly MethodInfo _asQueryable = typeof(Queryable)
+            .GetMethods(BindingFlags.Static | BindingFlags.Public)
+            .First(m => m.Name == nameof(Queryable.AsQueryable) && m.IsGenericMethod);
+
+        private static IQueryable<T> MakeEmptyQueryable<T>()
+        {
+            return Enumerable.Empty<T>().AsQueryable();
         }
 
         // http://stackoverflow.com/a/2616980/1402923
@@ -36,6 +100,48 @@ namespace QueryableExtensions
             var objectMember = Expression.Convert(expression, typeof(object));
             var getterLambda = Expression.Lambda<Func<object>>(objectMember);
             return getterLambda.Compile().Invoke();
+        }
+    }
+
+    internal class ExtensionRebinder : ExpressionVisitor
+    {
+        readonly object _enumerableQuery;
+        readonly Expression _replacementQuery;
+        readonly List<KeyValuePair<string, Expression>> _parameters;
+
+        public ExtensionRebinder(
+            object enumerableQuery, Expression replacementQuery,
+            List<KeyValuePair<string, Expression>> parameters)
+        {
+            _enumerableQuery = enumerableQuery;
+            _replacementQuery = replacementQuery;
+            _parameters = parameters;
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            return node.Value == _enumerableQuery ? _replacementQuery : node;
+        }
+
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (node.NodeType == ExpressionType.MemberAccess
+                && node.Expression.NodeType == ExpressionType.Constant
+                && node.Expression.Type.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute)))
+            {
+                string name = node.Member.Name;
+
+                Expression replacement = _parameters
+                    .Where(p => p.Key == name)
+                    .Select(p => p.Value)
+                    .FirstOrDefault();
+
+                if (replacement != null)
+                {
+                    return replacement;
+                }
+            }
+            return base.VisitMember(node);
         }
     }
 }
