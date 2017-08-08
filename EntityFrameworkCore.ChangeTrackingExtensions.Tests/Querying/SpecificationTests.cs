@@ -1,9 +1,11 @@
 ﻿#if EF_CORE
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
 #else
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -105,6 +107,25 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         }
 
         [TestMethod]
+        public void ShouldSupportComplexExpressions()
+        {
+            var user = new User
+            {
+                IsDeleted = false,
+                Posts = new List<Post>
+                {
+                    new Post { IsDeleted = false },
+                },
+            };
+
+            var activeUserSpec = new Specification<User>(u => !u.IsDeleted);
+            var hasPostsSpec = new Specification<User>(u => u.Posts.Any(p => !p.IsDeleted));
+            var validUserSpec = activeUserSpec && hasPostsSpec;
+
+            Assert.IsTrue(validUserSpec.IsSatisfiedBy(user));
+        }
+
+        [TestMethod]
         public void ShouldWorkWithEnumerable()
         {
             var users = new[]
@@ -139,93 +160,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 context.Users.Where(andSpec).Single();
 
-            }
-        }
-
-        [TestMethod]
-        public void ShouldBeExpandedInExpressionTree()
-        {
-            using (var context = CreateSqliteDbContext())
-            {
-                context.Users.AddRange(new[]
-                {
-                    new User { Login = "admin", IsDeleted = false },
-                    new User { Login = "admin", IsDeleted = true },
-                });
-
-                context.SaveChanges();
-
-                var andSpec = new UserAndSpec("admin");
-                
-                context.Users.AsExpandable()
-                    .GroupBy(u => u.Login)
-                    .Where(g => g.Count(andSpec) == 1)
-                    .Single();
-            }
-        }
-
-        [TestMethod]
-        public void ShouldSupportConditionalLogicInExpressionTree()
-        {
-            using (var context = CreateSqliteDbContext())
-            {
-                context.Users.AddRange(new[]
-                {
-                    new User { Login = "admin", IsDeleted = false },
-                    new User { Login = "admin", IsDeleted = true },
-                });
-
-                context.SaveChanges();
-
-                var activeSpec = new UserActiveSpec();
-                var adminSpec = new UserByLoginSpec("admin");
-
-                context.Users.AsExpandable()
-                    .GroupBy(u => u.Login)
-                    .Where(g => g.Count(activeSpec && adminSpec) == 1)
-                    .Single();
-            }
-        }
-
-        [TestMethod]
-        public void ShouldSupportClosuresInExpressionTree()
-        {
-            using (var context = CreateSqliteDbContext())
-            {
-                context.Users.AddRange(new[]
-                {
-                    new User { Login = "admin", IsDeleted = false },
-                    new User { Login = "admin", IsDeleted = true },
-                });
-
-                context.SaveChanges();
-
-                string login = "admin";
-
-                context.Users.AsExpandable()
-                    .GroupBy(u => u.Login)
-                    .Where(g => g.Count(new UserAndSpec(login)) == 1)
-                    .Single();
-            }
-        }
-
-        [TestMethod]
-        public void ShouldSupportParametersInExpressionTree()
-        {
-            using (var context = CreateSqliteDbContext())
-            {
-                context.Users.AddRange(new[]
-                {
-                    new User { Login = "admin", IsDeleted = false },
-                    new User { Login = "admin", IsDeleted = true },
-                });
-
-                context.SaveChanges();
-
-                context.Users.AsExpandable()
-                    .GroupBy(u => u.Login)
-                    .Where(g => g.Count(!new UserAndSpec(g.Key)) == 0)
-                    .Single();
             }
         }
     }

@@ -28,50 +28,41 @@ namespace QueryableExtensions
     [DebuggerDisplay("{Predicate}")]
     public class Specification<T> : ISpecification<T>
     {
-        readonly Lazy<Func<T, bool>> _lazyFunc;
+        private Func<T, bool> _function;
 
+        private Func<T, bool> Function => _function ?? (_function = Predicate.Compile());
+        
         protected Expression<Func<T, bool>> Predicate;
 
-        protected Specification()
-        {
-            _lazyFunc = new Lazy<Func<T, bool>>(() => ToExpression().Compile());
-        }
+        protected Specification() { }
 
         public Specification(Expression<Func<T, bool>> predicate)
-            : this()
         {
             Predicate = predicate;
         }
 
-        public virtual bool IsSatisfiedBy(T entity)
+        public bool IsSatisfiedBy(T entity)
         {
-            return _lazyFunc.Value.Invoke(entity);
+            return Function.Invoke(entity);
         }
 
-        public virtual Expression<Func<T, bool>> ToExpression()
+        public Expression<Func<T, bool>> ToExpression()
         {
             return Predicate;
         }
-
+        
         public static implicit operator Func<T, bool>(Specification<T> spec)
         {
             if (spec == null) throw new ArgumentNullException(nameof(spec));
 
-            return spec._lazyFunc.Value;
+            return spec.Function;
         }
 
         public static implicit operator Expression<Func<T, bool>>(Specification<T> spec)
         {
             if (spec == null) throw new ArgumentNullException(nameof(spec));
 
-            return spec.ToExpression();
-        }
-
-        public static implicit operator Specification<T>(Expression<Func<T, bool>> predicate)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-            return new Specification<T>(predicate);
+            return spec.Predicate;
         }
         
         /// <remarks>
@@ -98,8 +89,8 @@ namespace QueryableExtensions
 
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
-                    Expression.Not(spec.ToExpression().Body),
-                    spec.ToExpression().Parameters));
+                    Expression.Not(spec.Predicate.Body),
+                    spec.Predicate.Parameters));
         }
 
         public static Specification<T> operator &(Specification<T> left, Specification<T> right)
@@ -107,14 +98,17 @@ namespace QueryableExtensions
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            ParameterExpression parameter = left.ToExpression().Parameters[0];
+            var leftExpr = left.Predicate;
+            var rightExpr = right.Predicate;
+            var leftParam = leftExpr.Parameters[0];
+            var rightParam = rightExpr.Parameters[0];
 
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
                     Expression.AndAlso(
-                        left.ToExpression().Body,
-                        new ParameterReplacer(parameter).Visit(right.ToExpression().Body)),
-                    parameter));
+                        leftExpr.Body,
+                        new ParameterReplacer(rightParam, leftParam).Visit(rightExpr.Body)),
+                    leftParam));
         }
 
         public static Specification<T> operator |(Specification<T> left, Specification<T> right)
@@ -122,29 +116,34 @@ namespace QueryableExtensions
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            ParameterExpression parameter = left.ToExpression().Parameters[0];
-
+            var leftExpr = left.Predicate;
+            var rightExpr = right.Predicate;
+            var leftParam = leftExpr.Parameters[0];
+            var rightParam = rightExpr.Parameters[0];
+            
             return new Specification<T>(
                 Expression.Lambda<Func<T, bool>>(
                     Expression.OrElse(
-                        left.ToExpression().Body,
-                        new ParameterReplacer(parameter).Visit(right.ToExpression().Body)),
-                    parameter));
+                        leftExpr.Body,
+                        new ParameterReplacer(rightParam, leftParam).Visit(rightExpr.Body)),
+                    leftParam));
         }
     }
 
     internal class ParameterReplacer : ExpressionVisitor
     {
         readonly ParameterExpression _parameter;
+        readonly ParameterExpression _replacement;
 
-        public ParameterReplacer(ParameterExpression parameter)
+        public ParameterReplacer(ParameterExpression parameter, ParameterExpression replacement)
         {
             _parameter = parameter;
+            _replacement = replacement;
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            return base.VisitParameter(_parameter);
+            return base.VisitParameter(_parameter == node ? _replacement : node);
         }
     }
 }

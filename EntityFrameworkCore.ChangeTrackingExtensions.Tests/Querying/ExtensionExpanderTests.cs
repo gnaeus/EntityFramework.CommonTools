@@ -136,7 +136,7 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
     }
 
     [TestClass]
-    public class ExpandableExtensionsTests : TestInitializer
+    public class ExtensionExpanderTests : TestInitializer
     {
         [TestMethod]
         public void Test()

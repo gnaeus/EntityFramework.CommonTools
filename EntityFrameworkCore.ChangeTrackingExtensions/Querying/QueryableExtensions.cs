@@ -22,7 +22,9 @@ namespace QueryableExtensions
         /// </summary>
         public static IQueryable<T> AsExpandable<T>(this IQueryable<T> queryable)
         {
-            return queryable.AsVisitable(new ExpandExtensionsVisitor());
+            if (queryable == null) throw new ArgumentNullException(nameof(queryable));
+
+            return queryable.AsVisitable(new ExtensionExpander());
         }
 
         /// <summary>
