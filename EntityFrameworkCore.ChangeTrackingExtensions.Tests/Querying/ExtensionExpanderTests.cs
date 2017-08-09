@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
@@ -13,90 +12,11 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif
 {
-    public static class Q
-    {
-        private class ExtensionMethodVisitor : System.Linq.Expressions.ExpressionVisitor
-        {
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                MethodInfo method = node.Method;
-
-                if (method.IsStatic && method.Name.StartsWith("Filter"))
-                {
-                    Type queryableType = method.GetParameters().First().ParameterType;
-
-                    Type entityType = queryableType.GetGenericArguments().Single();
-
-                    object inputQueryable = typeof(ExtensionMethodVisitor)
-                        .GetMethod(nameof(EmptyQueryable))
-                        .MakeGenericMethod(entityType)
-                        .Invoke(null, null);
-
-                    if (method.IsGenericMethod)
-                    {
-                        method = method.MakeGenericMethod(entityType);
-                    }
-
-                    object outputQueryable = method.Invoke(null, new[] { inputQueryable });
-
-                    var expression = (MethodCallExpression)((IQueryable)outputQueryable).Expression;
-
-                    Expression sourceArg = node.Arguments[0];
-
-                    if (!typeof(IQueryable).IsAssignableFrom(sourceArg.Type))
-                    {
-                        MethodInfo asQueryable = typeof(Queryable)
-                            .GetMethods(BindingFlags.Static | BindingFlags.Public)
-                            .First(m => m.Name == nameof(Queryable.AsQueryable) && m.IsGenericMethod)
-                            .MakeGenericMethod(entityType);
-
-                        sourceArg = Expression.Call(asQueryable, sourceArg);
-                    }
-
-                    var outputExpression = new SourceReplacementVisitor(sourceArg).Visit(expression);
-
-                    return outputExpression;
-                }
-
-                return base.VisitMethodCall(node);
-            }
-
-            public static IQueryable<T> EmptyQueryable<T>()
-            {
-                return Enumerable.Empty<T>().AsQueryable();
-            }
-        }
-
-        private class SourceReplacementVisitor : System.Linq.Expressions.ExpressionVisitor
-        {
-            readonly Expression _replacementArg;
-
-            public SourceReplacementVisitor(Expression replacementArg)
-            {
-                _replacementArg = replacementArg;
-            }
-
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                Expression sourceArg = node.Arguments.FirstOrDefault();
-
-                if (sourceArg != null && typeof(EnumerableQuery).IsAssignableFrom(sourceArg.Type))
-                {
-                    return node.Update(
-                        null, new[] { _replacementArg }.Concat(node.Arguments.Skip(1)));
-                }
-
-                return base.VisitMethodCall(node);
-            }
-        }
-    }
-
     public static class UserQueryableExtensions
     {
         [Expandable]
@@ -182,13 +102,13 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 var query = context.Users.AsExpandable()
                     .FilterByLogin(login)
                     .Select(u => u.Posts
-                        .FilterByEditor(1)
+                        .FilterByEditor(updaterId)
                         .FilterByEditor(u.Id)
                         .FilterByEditor(u.Id + 1)
                         .FilterToday(5)
                         .Count());
 
-                var expected = context.Users.AsExpandable()
+                var expected = context.Users
                     .Where(u => !u.IsDeleted)
                     .Where(u => u.Login == login)
                     .Select(u => u.Posts

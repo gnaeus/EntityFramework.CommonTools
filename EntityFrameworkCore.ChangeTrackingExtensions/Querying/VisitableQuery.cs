@@ -9,8 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Reflection;
 
 #if EF_CORE
@@ -24,7 +22,6 @@ using System.Data.Entity.Infrastructure;
 
 namespace EntityFramework.ChangeTrackingExtensions
 #else
-
 namespace QueryableExtensions
 #endif
 {   
@@ -39,17 +36,17 @@ namespace QueryableExtensions
         , IDbAsyncEnumerable<T>
 #endif
     {
-        readonly ExpressionVisitor _visitor;
+        readonly ExpressionVisitor[] _visitors;
         readonly IQueryable<T> _queryable;
         readonly VisitableQueryProvider<T> _provider;
 
-        internal ExpressionVisitor Visitor => _visitor;
+        internal ExpressionVisitor[] Visitors => _visitors;
         internal IQueryable<T> InnerQuery => _queryable;
 
-        public VisitableQuery(IQueryable<T> queryable, ExpressionVisitor visitor)
+        public VisitableQuery(IQueryable<T> queryable, ExpressionVisitor[] visitors)
         {
             _queryable = queryable;
-            _visitor = visitor;
+            _visitors = visitors;
             _provider = new VisitableQueryProvider<T>(this);
         }
 
@@ -98,161 +95,49 @@ namespace QueryableExtensions
     internal class VisitableQueryOfClass<T> : VisitableQuery<T>
         where T : class
     {
-        public VisitableQueryOfClass(IQueryable<T> queryable, ExpressionVisitor visitor)
-            : base(queryable, visitor)
+        public VisitableQueryOfClass(IQueryable<T> queryable, ExpressionVisitor[] visitors)
+            : base(queryable, visitors)
         {
         }
 
 #if EF_CORE
         public IQueryable<T> Include<TProperty>(Expression<Func<T, TProperty>> navigationPropertyPath)
         {
-            return InnerQuery.Include(navigationPropertyPath).AsVisitable(Visitor);
+            return InnerQuery.Include(navigationPropertyPath).AsVisitable(Visitors);
         }
 #elif EF_6
         public IQueryable<T> Include(string path)
         {
-            return InnerQuery.Include(path).AsVisitable(Visitor);
+            return InnerQuery.Include(path).AsVisitable(Visitors);
         }
 #endif
     }
 
     internal static class VisitableQueryFactory<T>
     {
-        public static readonly Func<IQueryable<T>, ExpressionVisitor, VisitableQuery<T>> Create;
+        public static readonly Func<IQueryable<T>, ExpressionVisitor[], VisitableQuery<T>> Create;
 
         static VisitableQueryFactory()
         {
             if (!typeof(T).GetTypeInfo().IsClass)
             {
-                Create = (query, visitor) => new VisitableQuery<T>(query, visitor);
+                Create = (query, visitors) => new VisitableQuery<T>(query, visitors);
                 return;
             }
 
             var queryType = typeof(IQueryable<T>);
-            var visitorType = typeof(ExpressionVisitor);
+            var visitorsType = typeof(ExpressionVisitor[]);
             var ctorInfo = typeof(VisitableQueryOfClass<>)
                 .MakeGenericType(typeof(T))
-                .GetConstructor(new[] { queryType, visitorType });
+                .GetConstructor(new[] { queryType, visitorsType });
 
             var queryParam = Expression.Parameter(queryType);
-            var visitorParam = Expression.Parameter(visitorType);
-            var newExpr = Expression.New(ctorInfo, queryParam, visitorParam);
-            var createExpr = Expression.Lambda<Func<IQueryable<T>, ExpressionVisitor, VisitableQuery<T>>>(
-                newExpr, queryParam, visitorParam);
+            var visitorsParam = Expression.Parameter(visitorsType);
+            var newExpr = Expression.New(ctorInfo, queryParam, visitorsParam);
+            var createExpr = Expression.Lambda<Func<IQueryable<T>, ExpressionVisitor[], VisitableQuery<T>>>(
+                newExpr, queryParam, visitorsParam);
 
             Create = createExpr.Compile();
-        }
-    }
-#endif
-
-    internal class VisitableQueryProvider<T> : IQueryProvider
-#if EF_CORE
-        , IAsyncQueryProvider
-#elif EF_6
-        , IDbAsyncQueryProvider
-#endif
-    {
-        readonly VisitableQuery<T> _query;
-
-        public VisitableQueryProvider(VisitableQuery<T> query)
-        {
-            _query = query;
-        }
-
-        /// <summary>
-        /// The following four methods first call ExpressionExpander to visit the expression tree,
-        /// then call upon the inner query to do the remaining work.
-        /// </summary>
-        IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)
-        {
-            expression = _query.Visitor.Visit(expression);
-            return _query.InnerQuery.Provider.CreateQuery<TElement>(expression).AsVisitable(_query.Visitor);
-        }
-
-        IQueryable IQueryProvider.CreateQuery(Expression expression)
-        {
-            expression = _query.Visitor.Visit(expression);
-            return _query.InnerQuery.Provider.CreateQuery(expression);
-        }
-
-        TResult IQueryProvider.Execute<TResult>(Expression expression)
-        {
-            expression = _query.Visitor.Visit(expression);
-            return _query.InnerQuery.Provider.Execute<TResult>(expression);
-        }
-
-        object IQueryProvider.Execute(Expression expression)
-        {
-            expression = _query.Visitor.Visit(expression);
-            return _query.InnerQuery.Provider.Execute(expression);
-        }
-
-#if EF_CORE
-        public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
-        {
-            expression = _query.Visitor.Visit(expression);
-            var asyncProvider = _query.InnerQuery.Provider as IAsyncQueryProvider;
-            return asyncProvider.ExecuteAsync<TResult>(expression);
-        }
-
-        public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-        {
-            expression = _query.Visitor.Visit(expression);
-            var asyncProvider = _query.InnerQuery.Provider as IAsyncQueryProvider;
-            return asyncProvider?.ExecuteAsync<TResult>(expression, cancellationToken)
-                ?? Task.FromResult(_query.InnerQuery.Provider.Execute<TResult>(expression));
-        }
-#elif EF_6
-        public Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken)
-        {
-            expression = _query.Visitor.Visit(expression);
-            var asyncProvider = _query.InnerQuery.Provider as IDbAsyncQueryProvider;
-            return asyncProvider?.ExecuteAsync(expression, cancellationToken)
-                ?? Task.FromResult(_query.InnerQuery.Provider.Execute(expression));
-        }
-
-        public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-        {
-            expression = _query.Visitor.Visit(expression);
-            var asyncProvider = _query.InnerQuery.Provider as IDbAsyncQueryProvider;
-            return asyncProvider?.ExecuteAsync<TResult>(expression, cancellationToken)
-                ?? Task.FromResult(_query.InnerQuery.Provider.Execute<TResult>(expression));
-        }
-#endif
-    }
-
-#if EF_6
-    /// <summary>
-    /// Class for async-await style list enumeration support
-    /// (e.g. <see cref="System.Data.Entity.QueryableExtensions.ToListAsync(IQueryable)"/>)
-    /// </summary>
-    internal class DbAsyncEnumerator<T> : IDisposable, IDbAsyncEnumerator<T>
-    {
-        private readonly IEnumerator<T> _inner;
-
-        public DbAsyncEnumerator(IEnumerator<T> inner)
-        {
-            _inner = inner;
-        }
-
-        public void Dispose()
-        {
-            _inner.Dispose();
-        }
-
-        public Task<bool> MoveNextAsync(CancellationToken cancellationToken)
-        {
-            return Task.FromResult(_inner.MoveNext());
-        }
-
-        public T Current
-        {
-            get { return _inner.Current; }
-        }
-
-        object IDbAsyncEnumerator.Current
-        {
-            get { return Current; }
         }
     }
 #endif
