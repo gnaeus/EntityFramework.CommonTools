@@ -19,7 +19,11 @@ namespace QueryableExtensions
         {
             if (queryable == null) throw new ArgumentNullException(nameof(queryable));
 
+#if EF_CORE
+            return queryable.AsVisitable(new ExtensionExpander(), new AsQueryableExpander());
+#else
             return queryable.AsVisitable(new ExtensionExpander());
+#endif
         }
 
         /// <summary>

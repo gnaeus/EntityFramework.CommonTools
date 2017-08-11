@@ -84,6 +84,7 @@
     <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\TransactionLog\**\*.cs">
       <Link>TransactionLog\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\AssertExtensions.cs" />
     <Compile Include="Extensions\TableNameExtensionsTests.cs" />
     <Compile Include="Extensions\ChangeTrackingExtensionsTests.cs" />
     <Compile Include="TestInitializer.cs" />

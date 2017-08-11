@@ -79,6 +79,25 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
         }
     }
 
+    public static class NestedExtensions
+    {
+        [Expandable]
+        public static IQueryable<Post> HasPostsWithAuthorByLogin(
+            this IEnumerable<Post> posts, string login)
+        {
+            return posts.AsQueryable().Where(p => p.Author.Login == login);
+        }
+
+        [Expandable]
+        public static IQueryable<Post> SelectPostsThat_HasPostsWithAuthorByLogin(
+            this IEnumerable<Post> posts, string login)
+        {
+            return posts.AsQueryable()
+                .SelectMany(p => p.Author.Posts
+                    .HasPostsWithAuthorByLogin(login));
+        }
+    }
+
     [TestClass]
     public class ExtensionExpanderTests : TestInitializer
     {
@@ -112,6 +131,9 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     .Where(u => !u.IsDeleted)
                     .Where(u => u.Login == login)
                     .Select(u => u.Posts
+#if !EF_CORE
+                        .AsQueryable()
+#endif
                         .Where(p => p.UpdaterUserId == updaterId)
                         .Where(p => p.UpdaterUserId == u.Id)
                         .Where(p => p.UpdaterUserId == u.Id + 1)
@@ -119,8 +141,12 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                         .Where(p => p.CreatedUtc > today)
                         .Take(5)
                         .Count());
-
+                
                 Assert.AreEqual(expected.ToString(), query.ToString());
+
+                Assert.AreNotSame(expected.Expression, query.Expression);
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
                 Assert.IsNotNull(query.FirstOrDefault());
             }
@@ -139,14 +165,49 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
 
                 var expected = context.Users
                     .SelectMany(u => u.Posts
+#if !EF_CORE
+                        .AsQueryable()
+#endif
                         .Where(p => !p.IsDeleted)
                         .Select(p => p.Author)
                         .SelectMany(a => a.Posts));
 
                 Assert.AreEqual(expected.ToString(), query.ToString());
 
+                Assert.AreNotSame(expected.Expression, query.Expression);
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
+
                 Assert.IsNull(query.FirstOrDefault());
             }
+        }
+        
+        [TestMethod]
+        public void ShouldExpandNestedExtensions()
+        {
+            var query = Enumerable.Empty<User>()
+                .AsQueryable()
+                .AsExpandable()
+                .SelectMany(u => u.Posts
+                    .SelectPostsThat_HasPostsWithAuthorByLogin(u.Login));
+
+            var expected = Enumerable.Empty<User>()
+                .AsQueryable()
+                .SelectMany(u => u.Posts
+#if !EF_CORE
+                    .AsQueryable()
+#endif
+                    .SelectMany(p => p.Author.Posts
+#if !EF_CORE
+                        .AsQueryable()
+#endif
+                        .Where(ap => ap.Author.Login == u.Login)));
+
+            Assert.AreNotSame(expected.Expression, query.Expression);
+
+            Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
+
+            Assert.IsNull(query.FirstOrDefault());
         }
     }
 }
