@@ -16,7 +16,7 @@ namespace QueryableExtensions
     /// <summary>
     /// <see cref="ExpressionVisitor"/> that expands <see cref="IQueryable{T}"/> extension methods inside Expression.
     /// </summary>
-    internal class ExtensionExpander : ExpressionVisitor
+    public class ExtensionExpander : ExpressionVisitor
     {
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {

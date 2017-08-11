@@ -14,7 +14,7 @@ namespace QueryableExtensions
     /// <summary>
     /// <see cref="ExpressionVisitor"/> that expands <see cref="ISpecification{T}"/> inside Expression.
     /// </summary>
-    internal class SpecificationExpander : ExpressionVisitor
+    public class SpecificationExpander : ExpressionVisitor
     {
         protected override Expression VisitUnary(UnaryExpression node)
         {
