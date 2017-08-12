@@ -7,7 +7,7 @@ public static IQueryable<T> AsVisitable<T>(
     this IQueryable<T> queryable, params ExpressionVisitor[] visitors);
 ```
 
-## Expandable extension methods for IQueryable
+## <a name="ef-querying"></a> Expandable extension methods for IQueryable
 
 We can use extension methods for `IQueryable<T>` to incapsulate custom buisiness logic.  
 But if we call these methods from `Expression<TDelegate>`, we get runtime error.
@@ -61,3 +61,5 @@ public static IQueryable<Comment> FilterTodayComments(this IEnumerable<Comment> 
     return comments.AsQueryable().Where(c => c.CreationTime > today)
 }
 ```
+
+<br>

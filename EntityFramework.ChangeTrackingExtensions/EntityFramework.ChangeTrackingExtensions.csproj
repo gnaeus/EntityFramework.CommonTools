@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="EntityFramework.ChangeTrackingExtensions.nuspec" />
+    <None Include="Extensions\README.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

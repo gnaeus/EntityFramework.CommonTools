@@ -1,4 +1,4 @@
-﻿## Specification Pattern
+﻿## <a name="ef-specification"></a> Specification Pattern
 
 Generic implementation of [Specification Pattern](https://en.wikipedia.org/wiki/Specification_pattern).
 
@@ -81,3 +81,5 @@ var adminFiends = context.Users
     .Where(u => u.Firends.Any(spec))
     .ToList();
 ```
+
+<br>
