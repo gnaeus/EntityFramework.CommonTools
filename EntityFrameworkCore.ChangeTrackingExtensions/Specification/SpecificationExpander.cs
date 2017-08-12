@@ -8,7 +8,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions
 #elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions
 #else
-namespace QueryableExtensions
+namespace System.Linq.CommonTools
 #endif
 {
     /// <summary>
@@ -60,17 +60,11 @@ namespace QueryableExtensions
             return base.VisitMethodCall(node);
         }
 
-        private Expression ExpandSpecification(Expression instance, MethodInfo toExpression)
+        private Expression ExpandSpecification(Expression specification, MethodInfo toExpression)
         {
-            return Visit((Expression)GetValue(Expression.Call(instance, toExpression)));
-        }
-        
-        // http://stackoverflow.com/a/2616980/1402923
-        private static object GetValue(Expression expression)
-        {
-            var objectMember = Expression.Convert(expression, typeof(object));
-            var getterLambda = Expression.Lambda<Func<object>>(objectMember);
-            return getterLambda.Compile().Invoke();
+            object expression = Expression.Call(specification, toExpression).GetValue();
+
+            return Visit((Expression)expression);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace QueryableExtensions
                 Type queryableType = methodParams.First().ParameterType;
                 Type entityType = queryableType.GetGenericArguments().Single();
                 
-                object inputQueryable = MakeInputQueryable(entityType);
+                object inputQueryable = MakeEnumerableQuery(entityType);
                 
                 object[] arguments = new object[methodParams.Length];
 
@@ -41,7 +41,7 @@ namespace QueryableExtensions
                 {
                     try
                     {
-                        arguments[i] = GetValue(node.Arguments[i]);
+                        arguments[i] = node.Arguments[i].GetValue();
                     }
                     catch (InvalidOperationException)
                     {
@@ -60,23 +60,23 @@ namespace QueryableExtensions
 
                 Expression expression = ((IQueryable)outputQueryable).Expression;
 
-                Expression sourceQueryable = node.Arguments[0];
+                Expression realQueryable = node.Arguments[0];
 
-                if (!typeof(IQueryable).IsAssignableFrom(sourceQueryable.Type))
+                if (!typeof(IQueryable).IsAssignableFrom(realQueryable.Type))
                 {
                     MethodInfo asQueryable = _asQueryable.MakeGenericMethod(entityType);
-                    sourceQueryable = Expression.Call(asQueryable, sourceQueryable);
+                    realQueryable = Expression.Call(asQueryable, realQueryable);
                 }
 
                 expression = new ExtensionRebinder(
-                    inputQueryable, sourceQueryable, argumentReplacements).Visit(expression);
+                    inputQueryable, realQueryable, argumentReplacements).Visit(expression);
                 
                 return Visit(expression);
             }
             return base.VisitMethodCall(node);
         }
         
-        private static object MakeInputQueryable(Type entityType)
+        private static object MakeEnumerableQuery(Type entityType)
         {
             return _queryableEmpty.MakeGenericMethod(entityType).Invoke(null, null);
         }
@@ -91,14 +91,6 @@ namespace QueryableExtensions
         private static IQueryable<T> QueryableEmpty<T>()
         {
             return Enumerable.Empty<T>().AsQueryable();
-        }
-
-        // http://stackoverflow.com/a/2616980/1402923
-        private static object GetValue(Expression expression)
-        {
-            var objectMember = Expression.Convert(expression, typeof(object));
-            var getterLambda = Expression.Lambda<Func<object>>(objectMember);
-            return getterLambda.Compile().Invoke();
         }
     }
 }
