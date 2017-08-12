@@ -13,7 +13,6 @@
  * [Concurrency Checks](#ef-concurrency-checks)
  * [Transaction Logs](#ef-transaction-logs)
  * [DbContext Extensions (EF 6 only)](#ef-6-only)
- 
  * [Usage with EntityFramework Core](#ef-core-usage)
  * [Usage with EntityFramework 6](#ef-6-usage)
 
