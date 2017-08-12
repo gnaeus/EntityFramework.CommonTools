@@ -1,10 +1,8 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 
+#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {

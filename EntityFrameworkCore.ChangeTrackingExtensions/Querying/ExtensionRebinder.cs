@@ -9,7 +9,7 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions
 #elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions
 #else
-namespace QueryableExtensions
+namespace System.Linq.CommonTools
 #endif
 {
     internal class ExtensionRebinder : ExpressionVisitor

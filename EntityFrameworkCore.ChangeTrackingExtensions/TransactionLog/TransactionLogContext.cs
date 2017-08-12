@@ -1,20 +1,17 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jil;
+
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-using System.Collections.Generic;
-using System.Linq;
+#elif EF_6
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
-using Jil;
 using EntityEntry = System.Data.Entity.Infrastructure.DbEntityEntry;
 
 namespace EntityFramework.ChangeTrackingExtensions
@@ -101,7 +98,7 @@ namespace EntityFramework.ChangeTrackingExtensions
             Type entityType = entity.GetType();
 #if EF_CORE
             var tableAndSchema = entry.Metadata.Relational();
-#else
+#elif EF_6
             if (_context.Configuration.ProxyCreationEnabled)
             {
                 entityType = ObjectContext.GetObjectType(entityType);
@@ -127,7 +124,7 @@ namespace EntityFramework.ChangeTrackingExtensions
                     .Properties
                     .Select(p => entry.Property(p.Name))
                     .ToDictionary(p => p.Metadata.Name, p => p.CurrentValue);
-#else
+#elif EF_6
                 var primaryKey = ((IObjectContextAdapter)_context)
                     .ObjectContext.ObjectStateManager
                     .GetObjectStateEntry(entity)

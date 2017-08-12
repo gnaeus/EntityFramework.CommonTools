@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
-#else
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif
 {

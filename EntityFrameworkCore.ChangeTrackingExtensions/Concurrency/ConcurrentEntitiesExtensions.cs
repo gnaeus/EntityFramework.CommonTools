@@ -1,16 +1,14 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-using System.Linq;
+#elif EF_6
 using System.Data.Entity;
-using System.Threading.Tasks;
 using System.Data.Entity.Infrastructure;
 using EntityEntry = System.Data.Entity.Infrastructure.DbEntityEntry;
 

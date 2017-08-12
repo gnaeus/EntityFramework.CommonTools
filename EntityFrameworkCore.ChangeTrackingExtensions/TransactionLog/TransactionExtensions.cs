@@ -1,12 +1,11 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Threading.Tasks;
+
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-using System.Threading.Tasks;
+#elif EF_6
 using System.Data.Entity;
 
 namespace EntityFramework.ChangeTrackingExtensions

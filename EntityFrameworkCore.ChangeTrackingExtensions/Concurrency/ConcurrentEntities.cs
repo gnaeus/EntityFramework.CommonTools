@@ -1,6 +1,6 @@
 ﻿#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions
 #endif
 {

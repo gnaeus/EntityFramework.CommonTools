@@ -1,14 +1,12 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+#elif EF_6
 using System.Data.Entity;
 using ModelBuilder = System.Data.Entity.DbModelBuilder;
 
@@ -23,7 +21,7 @@ namespace EntityFramework.ChangeTrackingExtensions
         public static int SaveChangesWithTransactionLog(
 #if EF_CORE
             this DbContext dbContext, Func<bool, int> baseSaveChanges, bool acceptAllChangesOnSuccess = true)
-#else
+#elif EF_6
             this DbContext dbContext, Func<int> baseSaveChanges)
 #endif
         {
@@ -33,7 +31,7 @@ namespace EntityFramework.ChangeTrackingExtensions
 #if EF_CORE
                 // save main entities
                 int count = baseSaveChanges.Invoke(acceptAllChangesOnSuccess);
-#else
+#elif EF_6
                 // save main entities
                 int count = baseSaveChanges.Invoke();
 #endif
@@ -41,7 +39,7 @@ namespace EntityFramework.ChangeTrackingExtensions
 #if EF_CORE
                 // save TransactionLog entities
                 baseSaveChanges.Invoke(acceptAllChangesOnSuccess);
-#else
+#elif EF_6
                 // save TransactionLog entities
                 baseSaveChanges.Invoke();
 #endif
@@ -58,7 +56,7 @@ namespace EntityFramework.ChangeTrackingExtensions
             Func<bool, CancellationToken, Task<int>> baseSaveChangesAsync,
             bool acceptAllChangesOnSuccess = true,
             CancellationToken cancellationToken = default(CancellationToken))
-#else
+#elif EF_6
             this DbContext dbContext,
             Func<CancellationToken, Task<int>> baseSaveChangesAsync,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -70,7 +68,7 @@ namespace EntityFramework.ChangeTrackingExtensions
 #if EF_CORE
                 // save main entities
                 int count = await baseSaveChangesAsync.Invoke(acceptAllChangesOnSuccess, cancellationToken);
-#else
+#elif EF_6
                 // save main entities
                 int count = await baseSaveChangesAsync.Invoke(cancellationToken);
 #endif
@@ -78,7 +76,7 @@ namespace EntityFramework.ChangeTrackingExtensions
 #if EF_CORE
                 // save TransactionLog entities
                 await baseSaveChangesAsync.Invoke(acceptAllChangesOnSuccess, cancellationToken);
-#else
+#elif EF_6
                 // save TransactionLog entities
                 await baseSaveChangesAsync.Invoke(cancellationToken);
 #endif

@@ -22,9 +22,9 @@ using System.Data.Entity.Infrastructure;
 
 namespace EntityFramework.ChangeTrackingExtensions
 #else
-namespace QueryableExtensions
+namespace System.Linq.CommonTools
 #endif
-{   
+{
     /// <summary>
     /// An <see cref="IQueryable{T}"/> wrapper that allows us to visit
     /// the query's expression tree just before LINQ to SQL gets to it.

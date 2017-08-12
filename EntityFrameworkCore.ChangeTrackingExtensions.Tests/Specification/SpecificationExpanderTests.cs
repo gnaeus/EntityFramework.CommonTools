@@ -1,18 +1,12 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
-#else
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif
 {
@@ -48,10 +42,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     .Select(u => u.Posts.Where(postSpec));
 
                 var expected = context.Users
-                    .AsVisitable(new SpecificationExpander())
                     .Select(u => u.Posts.Where(p => !p.IsDeleted));
 
                 Assert.AreEqual(expected.ToString(), query.ToString());
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
                 Assert.IsNotNull(query.Single());
             }
@@ -77,7 +72,6 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
         }
 
-#if !EF_CORE
         [TestMethod]
         public void ShouldCallToExpressionInExpressionTree()
         {
@@ -100,19 +94,28 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 var postSpec = new PostByTitleSpec(title);
 
                 var query = context.Users
+#if EF_CORE
+                    .AsVisitable(new SpecificationExpander(), new AsQueryableExpander())
+#elif EF_6
                     .AsVisitable(new SpecificationExpander())
-                    .Select(u => u.Posts.AsQueryable().Where(postSpec.ToExpression()));
-                
+#endif
+                    .SelectMany(u => u.Posts.AsQueryable().Where(postSpec.ToExpression()));
+
                 var expected = context.Users
-                    .AsVisitable(new SpecificationExpander())
-                    .Select(u => u.Posts.Where(p => p.Title == title));
+#if EF_CORE
+                    .AsVisitable(new AsQueryableExpander())
+#endif
+                    .SelectMany(u => u.Posts.AsQueryable().Where(p => p.Title == title));
+
+                var e = expected.ToList();
 
                 Assert.AreEqual(expected.ToString(), query.ToString());
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
                 Assert.IsNotNull(query.Single());
             }
         }
-#endif
 
         public class PostByContentSpec : Specification<Post>
         {
@@ -146,10 +149,11 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                     .Select(u => u.Posts.Where(new PostByContentSpec(content) || new PostByContentSpec(content)));
 
                 var expected = context.Users
-                    .AsVisitable(new SpecificationExpander())
                     .Select(u => u.Posts.Where(p => p.Content.Contains(content) || p.Content.Contains(content)));
 
                 Assert.AreEqual(expected.ToString(), query.ToString());
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
                 Assert.IsNotNull(query.Single());
             }
@@ -186,8 +190,9 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 .SelectMany(u => u.Posts.Where(new PostRecursiveSpec(content)));
 
             var expected = users.AsQueryable()
-                .AsVisitable(new SpecificationExpander())
                 .SelectMany(u => u.Posts.Where(p => p.Author.Posts.Any(ap => ap.Content.Contains(content))));
+
+            Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
             Assert.AreEqual(expected.Single(), query.Single());
         }
@@ -212,8 +217,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
                 try
                 {
                     var query = context.Users
-                    .AsVisitable(new SpecificationExpander())
-                    .Select(u => u.Posts.Where(new PostByContentSpec(u.Login)));
+                        .AsVisitable(new SpecificationExpander())
+                        .Select(u => u.Posts.Where(new PostByContentSpec(u.Login)));
                 }
                 catch (InvalidOperationException ex)
                 {

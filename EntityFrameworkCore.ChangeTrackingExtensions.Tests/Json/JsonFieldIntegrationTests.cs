@@ -1,10 +1,8 @@
-﻿#if EF_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
-#else
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif
 {

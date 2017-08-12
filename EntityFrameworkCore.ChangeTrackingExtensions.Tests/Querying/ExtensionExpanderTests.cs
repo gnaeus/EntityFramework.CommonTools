@@ -1,18 +1,13 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
-#else
-using System;
-using System.Collections.Generic;
+#elif EF_6
 using System.Data.Entity;
-using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFramework.ChangeTrackingExtensions.Tests
 #endif

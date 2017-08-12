@@ -20,7 +20,7 @@ using System.Data.Entity.Infrastructure;
 
 namespace EntityFramework.ChangeTrackingExtensions
 #else
-namespace QueryableExtensions
+namespace System.Linq.CommonTools
 #endif
 {
     internal class VisitableQueryProvider<T> : IQueryProvider
