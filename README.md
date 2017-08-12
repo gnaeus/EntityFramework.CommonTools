@@ -1,9 +1,9 @@
-# <img src="icon.png" style="height: 32px; vertical-align: text-bottom" /> EntityFramework.ChangeTrackingExtensions
+# <img src="icon.png" style="height: 32px; vertical-align: text-bottom" /> EntityFramework.CommonTools
  An extension for EntityFramework and EntityFramework Core that provides Auditing, Concurrency Checks, storing Complex Types as JSON and storing history of all changes from DbContext to Transaction Log.
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/EntityFramework.ChangeTrackingExtensions/master/LICENSE)
-[![NuGet version](https://img.shields.io/nuget/v/EntityFramework.ChangeTrackingExtensions.svg)](https://www.nuget.org/packages/EntityFramework.ChangeTrackingExtensions)
-[![NuGet version](https://img.shields.io/nuget/v/EntityFrameworkCore.ChangeTrackingExtensions.svg)](https://www.nuget.org/packages/EntityFrameworkCore.ChangeTrackingExtensions)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gnaeus/EntityFramework.CommonTools/master/LICENSE)
+[![NuGet version](https://img.shields.io/nuget/v/EntityFramework.CommonTools.svg)](https://www.nuget.org/packages/EntityFramework.CommonTools)
+[![NuGet version](https://img.shields.io/nuget/v/EntityFrameworkCore.CommonTools.svg)](https://www.nuget.org/packages/EntityFrameworkCore.CommonTools)
 
 ## Documentation
  * [Expandable IQueryable extensions](#ef-querying)
@@ -15,6 +15,13 @@
  * [DbContext Extensions (EF 6 only)](#ef-6-only)
  * [Usage with EntityFramework Core](#ef-core-usage)
  * [Usage with EntityFramework 6](#ef-6-usage)
+
+### NuGet
+```
+PM> Install-Package EntityFramework.CommonTools
+
+PM> Install-Package EntityFrameworkCore.CommonTools
+```
 
 <br>
 
