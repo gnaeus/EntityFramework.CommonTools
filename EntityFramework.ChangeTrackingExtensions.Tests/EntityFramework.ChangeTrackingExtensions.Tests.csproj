@@ -75,11 +75,14 @@
     <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\Concurrency\**\*.cs">
       <Link>Concurrency\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\JsonField\**\*.cs">
-      <Link>JsonField\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\Json\**\*.cs">
+      <Link>Json\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\Querying\**\*.cs">
       <Link>Querying\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\Specification\**\*.cs">
+      <Link>Specification\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\EntityFrameworkCore.ChangeTrackingExtensions.Tests\TransactionLog\**\*.cs">
       <Link>TransactionLog\%(RecursiveDir)%(Filename)%(Extension)</Link>

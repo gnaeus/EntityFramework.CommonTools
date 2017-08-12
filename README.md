@@ -20,11 +20,11 @@
 There is an utility struct named `JsonField`, that helps to persist any Complex Type as JSON string in single table column.
 
 ```cs
-struct JsonField<TValue>
-    where TValue : class
+struct JsonField<TObject>
+    where TObject : class
 {
     public string Json { get; set; }
-    public TValue Value { get; set; }
+    public TObject Object { get; set; }
 }
 ```
 
@@ -46,8 +46,8 @@ class User
     // used by application code
     public Address Address
     {
-        get { return _address.Value; }
-        set { _address.Value = value; }
+        get { return _address.Object; }
+        set { _address.Object = value; }
     }
 
     // collection initialization by default
@@ -59,8 +59,8 @@ class User
     }
     public ICollection<string> Phones
     {
-        get { return _phones.Value; }
-        set { _phones.Value = value; }
+        get { return _phones.Object; }
+        set { _phones.Object = value; }
     }
 }
 
@@ -100,13 +100,13 @@ class MyEntity
 ```
 It uses the following implicit operator:
 ```cs
-struct JsonField<TValue>
+struct JsonField<TObject>
 {
-    public static implicit operator JsonField<TValue>(TValue value);
+    public static implicit operator JsonField<TObject>(TObject defaultValue);
 }
 ```
 
-The only caveat is that `TValue` object should not contain reference loops.  
+The only caveat is that `TObject` object should not contain reference loops.  
 Because `JsonField` uses [Jil](https://github.com/kevin-montrose/Jil) (the fastest .NET JSON serializer) behind the scenes.
 
 <br>

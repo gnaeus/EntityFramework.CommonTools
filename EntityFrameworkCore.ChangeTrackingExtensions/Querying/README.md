@@ -1,6 +1,15 @@
-﻿## Expandable extension-methods for `IQueryable<T>`
+﻿## Attaching ExpressionVisitor to IQueryable
 
-We can use extension-methods for `IQueryable<T>` to incapsulate custom buisiness logic.  
+With `.AsVisitable()` extension we can attach any `ExpressionVisitor` to `IQueryable<T>`.
+
+```cs
+public static IQueryable<T> AsVisitable<T>(
+    this IQueryable<T> queryable, params ExpressionVisitor[] visitors);
+```
+
+## Expandable extension methods for IQueryable
+
+We can use extension methods for `IQueryable<T>` to incapsulate custom buisiness logic.  
 But if we call these methods from `Expression<TDelegate>`, we get runtime error.
 
 ```cs
@@ -20,7 +29,7 @@ Comment[] comments = context.Posts
     .FilterByAuthor(authorId)   // it's OK
     .SelectMany(p => p.Comments
         .AsQueryable()
-        .FilterTodayComments()) // runtime error
+        .FilterTodayComments()) // will throw Error
     .ToArray();
 ```
 
@@ -35,7 +44,7 @@ Comment[] comments = context.Posts
     .ToArray();
 ```
 
-The only caveat is that our custom extension methods should have `[Expandable]` attribute.
+Expandable extension methods should return `IQueryable` and should have `[Expandable]` attribute.
 
 ```cs
 [Expandable]
@@ -51,12 +60,4 @@ public static IQueryable<Comment> FilterTodayComments(this IEnumerable<Comment> 
 
     return comments.AsQueryable().Where(c => c.CreationTime > today)
 }
-```
-
-## Attaching `ExpressionVisitor`s to `IQueryable<T>`
-
-With `.AsVisitable()` extension we can attach any `ExpressionVisitor` to `IQueryable<T>`.
-
-```cs
-public static IQueryable<T> AsVisitable<T>(this IQueryable<T> queryable, params ExpressionVisitor[] visitors)
 ```

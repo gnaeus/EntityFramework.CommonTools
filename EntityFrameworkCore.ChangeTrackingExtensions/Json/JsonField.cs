@@ -1,22 +1,21 @@
-﻿#if EF_CORE
-using System;
+﻿using System;
 using Jil;
 
+#if EF_CORE
 namespace EntityFrameworkCore.ChangeTrackingExtensions
-#else
-using System;
-using Jil;
-
+#elif EF_6
 namespace EntityFramework.ChangeTrackingExtensions
+#else
+namespace System.Linq.CommonTools
 #endif
 {
     /// <summary>
-    /// Utility struct for storing complex types as JSON strings in database table.
+    /// Utility structure for storing complex types as JSON strings in DB table.
     /// </summary>
-    public struct JsonField<TValue>
-        where TValue : class
+    public struct JsonField<TObject>
+        where TObject : class
     {
-        private TValue _value;
+        private TObject _object;
         private string _json;
         private bool _isMaterialized;
         private bool _hasDefault;
@@ -27,8 +26,8 @@ namespace EntityFramework.ChangeTrackingExtensions
             {
                 if (_isMaterialized)
                 {
-                    _json = _value == null
-                        ? null : JSON.Serialize(_value, Options.IncludeInherited);
+                    _json = _object == null
+                        ? null : JSON.Serialize(_object, Options.IncludeInherited);
                 }
                 return _json;
             }
@@ -39,7 +38,7 @@ namespace EntityFramework.ChangeTrackingExtensions
             }
         }
 
-        public TValue Value
+        public TObject Object
         {
             get
             {
@@ -53,29 +52,29 @@ namespace EntityFramework.ChangeTrackingExtensions
                         }
                         else
                         {
-                            _value = null;
+                            _object = null;
                         }
                     }
                     else
                     {
-                        _value = JSON.Deserialize<TValue>(_json);
+                        _object = JSON.Deserialize<TObject>(_json);
                     }
                     _isMaterialized = true;
                 }
-                return _value;
+                return _object;
             }
             set
             {
-                _value = value;
+                _object = value;
                 _isMaterialized = true;
             }
         }
 
-        public static implicit operator JsonField<TValue>(TValue value)
+        public static implicit operator JsonField<TObject>(TObject defaultValue)
         {
-            var field = new JsonField<TValue>();
+            var field = new JsonField<TObject>();
 
-            field._value = value;
+            field._object = defaultValue;
             field._hasDefault = true;
 
             return field;

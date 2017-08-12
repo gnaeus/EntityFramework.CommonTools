@@ -25,8 +25,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
             public Address Address
             {
-                get { return _address.Value; }
-                set { _address.Value = value; }
+                get { return _address.Object; }
+                set { _address.Object = value; }
             }
 
             private JsonField<ICollection<Phone>> _phones = new HashSet<Phone>();
@@ -37,8 +37,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
             public ICollection<Phone> Phones
             {
-                get { return _phones.Value; }
-                set { _phones.Value = value; }
+                get { return _phones.Object; }
+                set { _phones.Object = value; }
             }
         }
 
@@ -124,8 +124,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
             public IDictionary<string, int> Scores
             {
-                get { return _scores.Value; }
-                set { _scores.Value = value; }
+                get { return _scores.Object; }
+                set { _scores.Object = value; }
             }
         }
 
@@ -323,8 +323,8 @@ namespace EntityFramework.ChangeTrackingExtensions.Tests
             }
             public dynamic Value
             {
-                get { return _value.Value; }
-                set { _value.Value = value; }
+                get { return _value.Object; }
+                set { _value.Object = value; }
             }
         }
 

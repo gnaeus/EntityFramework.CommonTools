@@ -53,8 +53,8 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
         [NotMapped]
         public ICollection<string> Tags
         {
-            get { return _tags.Value; }
-            set { _tags.Value = value; }
+            get { return _tags.Object; }
+            set { _tags.Object = value; }
         }
 
         public bool IsDeleted { get; set; }
@@ -90,8 +90,8 @@ namespace EntityFrameworkCore.ChangeTrackingExtensions.Tests
         [NotMapped]
         public dynamic Value
         {
-            get { return _value.Value; }
-            set { _value.Value = value; }
+            get { return _value.Object; }
+            set { _value.Object = value; }
         }
 
         public bool IsDeleted { get; set; }
