@@ -8,11 +8,12 @@
 ## Documentation
  * [Expandable IQueryable extensions](#ef-querying)
  * [JSON Complex Types](#ef-json-field)
- * [Specification](#ef-specification)
+ * [Specification Pattern](#ef-specification)
  * [Auditable Entities](#ef-auditable-entities)
  * [Concurrency Checks](#ef-concurrency-checks)
  * [Transaction Logs](#ef-transaction-logs)
  * [DbContext Extensions (EF 6 only)](#ef-6-only)
+ 
  * [Usage with EntityFramework Core](#ef-core-usage)
  * [Usage with EntityFramework 6](#ef-6-usage)
 
