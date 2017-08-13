@@ -1,18 +1,13 @@
+version: 1.0.0.{build}
+
 image: Visual Studio 2017
-
-#install:
-#  - ps: Start-FileDownload 'https://download.microsoft.com/download/B/9/F/B9F1AF57-C14A-4670-9973-CDF47209B5BF/dotnet-dev-win-x64.1.0.4.exe'
-#  - cmd: dotnet-dev-win-x64.1.0.4.exe /quiet
-
-#environment:
-#  PATH: $(PATH);$(PROGRAMFILES)\dotnet\
 
 before_build:
   - nuget restore
 
 test_script:
-  - dotnet test --no-build .\EFCore.CommonTools.Tests\EntityFrameworkCore.CommonTools.Tests.csproj
-  - dotnet test --no-build .\EntityFramework.CommonTools.Tests\EntityFramework.CommonTools.Tests.csproj
+  - dotnet test --no-build --test-adapter-path:. --logger:Appveyor .\EFCore.CommonTools.Tests\EntityFrameworkCore.CommonTools.Tests.csproj
+  - dotnet test --no-build --test-adapter-path:. --logger:Appveyor .\EntityFramework.CommonTools.Tests\EntityFramework.CommonTools.Tests.csproj
 
 cache:
   - '%USERPROFILE%\.nuget\packages'
