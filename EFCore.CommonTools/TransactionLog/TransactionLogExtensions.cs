@@ -16,7 +16,7 @@ namespace EntityFramework.CommonTools
     public static partial class DbContextExtensions
     {
         /// <summary>
-        /// Wrapper for <see cref="DbContext.SaveChanges"/> that saves <see cref="TransactionLog"/> to DB.
+        /// Wrapper for <see cref="DbContext.SaveChanges()"/> that saves <see cref="TransactionLog"/> to DB.
         /// </summary>
         public static int SaveChangesWithTransactionLog(
 #if EF_CORE
@@ -48,7 +48,8 @@ namespace EntityFramework.CommonTools
         }
 
         /// <summary>
-        /// Wrapper for <see cref="DbContext.SaveChangesAsync"/> that saves <see cref="TransactionLog"/> to DB.
+        /// Wrapper for <see cref="DbContext.SaveChangesAsync(CancellationToken)"/>
+        /// that saves <see cref="TransactionLog"/> to DB.
         /// </summary>
         public static Task<int> SaveChangesWithTransactionLogAsync(
 #if EF_CORE

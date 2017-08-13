@@ -220,7 +220,10 @@ namespace EntityFramework.CommonTools.Tests
                         .AsVisitable(new SpecificationExpander())
                         .Select(u => u.Posts.Where(new PostByContentSpec(u.Login)));
                 }
-                catch (InvalidOperationException ex)
+
+#pragma warning disable CS0168 // Variable is declared but never used
+                catch (InvalidOperationException exception)
+#pragma warning restore CS0168 // Variable is declared but never used
                 {
                     throw;
                 }

@@ -8,7 +8,7 @@ namespace EntityFramework.CommonTools
     /// An entity can implement this interface if it should use Optimistic Concurrency Check
     /// with populating <see cref="RowVersion"/> from client-side. Allowed types:
     /// <para />
-    /// <typeparamref name="TRowVersion"/> is <see cref="byte[]"/>: 
+    /// <typeparamref name="TRowVersion"/> is <see cref="T:byte[]"/>: 
     /// RowVersion property should be decorated by [Timestamp] attribute.
     /// RowVersion column should have ROWVERSION type in SQL Server. 
     /// <para />

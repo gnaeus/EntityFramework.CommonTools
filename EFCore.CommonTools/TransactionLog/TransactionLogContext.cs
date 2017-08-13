@@ -18,7 +18,7 @@ namespace EntityFramework.CommonTools
 #endif
 {
     /// <summary>
-    /// Utility for capturing transaction logs from <see cref="DbContext.SaveChanges"/>.
+    /// Utility for capturing transaction logs from <see cref="DbContext.SaveChanges()"/>.
     /// Tracked entities must implement <see cref="ITransactionLoggable"/> interface.
     /// </summary>
     internal class TransactionLogContext
