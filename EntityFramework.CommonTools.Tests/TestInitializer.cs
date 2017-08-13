@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFramework.CommonTools.Tests
 {
+    [TestClass]
     public abstract class TestInitializer
     {
         private DbConnection _connection;

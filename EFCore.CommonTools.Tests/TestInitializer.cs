@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EntityFrameworkCore.CommonTools.Tests
 {
+    [TestClass]
     public abstract class TestInitializer
     {
         private SqliteConnection _connection;
