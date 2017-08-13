@@ -93,6 +93,9 @@ namespace System.Linq.CommonTools
             return base.VisitMethodCall(node);
         }
 
+        /// <summary>
+        /// Key is method from <see cref="Queryable"/>, Value is method from <see cref="Enumerable"/>
+        /// </summary>
         static readonly Dictionary<MethodInfo, MethodInfo> MethodReplacements;
 
         static AsQueryableExpressionExpander()
