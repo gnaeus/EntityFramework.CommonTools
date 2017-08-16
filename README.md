@@ -1,4 +1,4 @@
-# <img src="icon.png" style="height: 32px; vertical-align: text-bottom" /> EntityFramework.CommonTools
+# EntityFramework.CommonTools <img alt="logo" src="icon.png" width="128" height="128" align="right" />
 Extension for EntityFramework and EntityFramework Core that provides: Expandable Extension Methods, Complex Types as JSON, Auditing, Concurrency Checks, Specifications and serializable Transacton Logs.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/85f7aqrh2plkl7yn?svg=true)](https://ci.appveyor.com/project/gnaeus/entityframework-commontools)
