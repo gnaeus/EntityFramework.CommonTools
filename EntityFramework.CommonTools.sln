@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore.CommonT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.CommonTools.Tests", "EntityFramework.CommonTools.Tests\EntityFramework.CommonTools.Tests.csproj", "{B0EB94E6-C524-472F-B276-C8B992BB5092}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFrameworkCore.CommonTools.Tests", "EFCore.CommonTools.Tests\EntityFrameworkCore.CommonTools.Tests.csproj", "{3496C87F-E595-44F3-AB3C-E678A38DA950}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore.CommonTools.Tests", "EFCore.CommonTools.Tests\EntityFrameworkCore.CommonTools.Tests.csproj", "{3496C87F-E595-44F3-AB3C-E678A38DA950}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.CommonTools.Benchmarks", "EntityFramework.CommonTools.Benchmarks\EntityFramework.CommonTools.Benchmarks.csproj", "{01646964-497E-43A0-897C-267A3D04F429}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3496C87F-E595-44F3-AB3C-E678A38DA950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01646964-497E-43A0-897C-267A3D04F429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01646964-497E-43A0-897C-267A3D04F429}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01646964-497E-43A0-897C-267A3D04F429}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01646964-497E-43A0-897C-267A3D04F429}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
