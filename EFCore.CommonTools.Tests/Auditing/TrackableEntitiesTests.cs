@@ -22,7 +22,7 @@ namespace EntityFramework.CommonTools.Tests
                 context.SaveChanges();
 
                 context.Entry(user).Reload();
-                Assert.AreEqual(DateTime.UtcNow.Date, user.CreatedUtc.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, user.CreatedUtc.ToUniversalTime().Date);
 
                 // update
                 user.Login = "admin";
@@ -31,7 +31,7 @@ namespace EntityFramework.CommonTools.Tests
 
                 context.Entry(user).Reload();
                 Assert.IsNotNull(user.UpdatedUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date, user.UpdatedUtc?.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, user.UpdatedUtc?.ToUniversalTime().Date);
 
                 // delete
                 context.Users.Remove(user);
@@ -41,7 +41,7 @@ namespace EntityFramework.CommonTools.Tests
                 context.Entry(user).Reload();
                 Assert.AreEqual(true, user.IsDeleted);
                 Assert.IsNotNull(user.DeletedUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date, user.DeletedUtc?.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, user.DeletedUtc?.ToUniversalTime().Date);
             }
         }
     }

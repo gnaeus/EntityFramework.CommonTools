@@ -26,7 +26,7 @@ namespace EntityFramework.CommonTools.Tests
                 context.SaveChanges(author.Id);
 
                 context.Entry(post).Reload();
-                Assert.AreEqual(DateTime.UtcNow.Date, post.CreatedUtc.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, post.CreatedUtc.ToUniversalTime().Date);
                 Assert.AreEqual(author.Id, post.CreatorUserId);
 
                 // update
@@ -36,7 +36,7 @@ namespace EntityFramework.CommonTools.Tests
 
                 context.Entry(post).Reload();
                 Assert.IsNotNull(post.UpdatedUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date, post.UpdatedUtc?.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, post.UpdatedUtc?.ToUniversalTime().Date);
                 Assert.AreEqual(author.Id, post.UpdaterUserId);
 
                 // delete
@@ -47,7 +47,7 @@ namespace EntityFramework.CommonTools.Tests
                 context.Entry(post).Reload();
                 Assert.AreEqual(true, post.IsDeleted);
                 Assert.IsNotNull(post.DeletedUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date, post.DeletedUtc?.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, post.DeletedUtc?.ToUniversalTime().Date);
                 Assert.AreEqual(author.Id, post.DeleterUserId);
             }
         }
@@ -64,7 +64,7 @@ namespace EntityFramework.CommonTools.Tests
                 await context.SaveChangesAsync("admin");
 
                 context.Entry(settings).Reload();
-                Assert.AreEqual(DateTime.UtcNow.Date, settings.CreatedUtc.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, settings.CreatedUtc.ToUniversalTime().Date);
                 Assert.AreEqual("admin", settings.CreatorUser);
 
                 // update
@@ -74,7 +74,7 @@ namespace EntityFramework.CommonTools.Tests
 
                 context.Entry(settings).Reload();
                 Assert.IsNotNull(settings.UpdatedUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date, settings.UpdatedUtc?.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, settings.UpdatedUtc?.ToUniversalTime().Date);
                 Assert.AreEqual("admin", settings.UpdaterUser);
 
                 // delete
@@ -85,7 +85,7 @@ namespace EntityFramework.CommonTools.Tests
                 context.Entry(settings).Reload();
                 Assert.AreEqual(true, settings.IsDeleted);
                 Assert.IsNotNull(settings.DeletedUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date, settings.DeletedUtc?.Date);
+                Assert.AreEqual(DateTime.UtcNow.Date, settings.DeletedUtc?.ToUniversalTime().Date);
                 Assert.AreEqual("admin", settings.DeleterUser);
             }
         }
