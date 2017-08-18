@@ -1,13 +1,24 @@
 ﻿using System;
-using System.Data.Common;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 
+#if EF_CORE
+using Microsoft.Data.Sqlite;
+
+namespace EntityFrameworkCore.CommonTools.Benchmarks
+#else
+using System.Data.Common;
+
 namespace EntityFramework.CommonTools.Benchmarks
+#endif
 {
     public class DatabaseQueryBenchmark
     {
+#if EF_CORE
+        readonly SqliteConnection _connection = Context.CreateConnection();
+#else
         readonly DbConnection _connection = Context.CreateConnection();
+#endif
 
         [Benchmark(Baseline = true)]
         public object RawQuery()

@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
+#if EF_CORE
+namespace EntityFrameworkCore.CommonTools.Benchmarks
+#else
 namespace EntityFramework.CommonTools.Benchmarks
+#endif
 {
     public class User
     {

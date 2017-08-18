@@ -1,6 +1,11 @@
 ﻿using BenchmarkDotNet.Running;
 
+#if EF_CORE
+namespace EntityFrameworkCore.CommonTools.Benchmarks
+#else
 namespace EntityFramework.CommonTools.Benchmarks
+#endif
+
 {
     class Program
     {

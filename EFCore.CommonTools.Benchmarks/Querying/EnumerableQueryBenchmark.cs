@@ -2,7 +2,11 @@
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 
+#if EF_CORE
+namespace EntityFrameworkCore.CommonTools.Benchmarks
+#else
 namespace EntityFramework.CommonTools.Benchmarks
+#endif
 {
     public class EnumerableQueryBenchmark
     {

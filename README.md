@@ -90,6 +90,15 @@ public static IQueryable<Comment> FilterTodayComments(this IEnumerable<Comment> 
 }
 ```
 
+### [Benchmarks](./EFCore.CommonTools.Benchmarks/Querying/DatabaseQueryBenchmark.cs)
+```
+          Method |        Median |     StdDev | Scaled | Scaled-SD |
+---------------- |-------------- |----------- |------- |---------- |
+        RawQuery |   555.6202 μs | 15.1837 μs |   1.00 |      0.00 |
+ ExpandableQuery |   644.6258 μs |  3.7793 μs |   1.15 |      0.03 | <<<
+  NotCachedQuery | 2,277.7138 μs | 10.9754 μs |   4.06 |      0.10 |
+```
+
 <br>
 
 ## <a name="ef-json-field"></a> JSON Complex Types
