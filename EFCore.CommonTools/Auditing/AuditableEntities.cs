@@ -1,10 +1,8 @@
 ﻿using System;
 
 #if EF_CORE
-
 namespace EntityFrameworkCore.CommonTools
 #elif EF_6
-
 namespace EntityFramework.CommonTools
 #endif
 {

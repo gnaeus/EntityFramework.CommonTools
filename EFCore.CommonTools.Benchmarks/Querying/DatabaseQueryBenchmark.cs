@@ -15,9 +15,9 @@ namespace EntityFramework.CommonTools.Benchmarks
     public class DatabaseQueryBenchmark
     {
 #if EF_CORE
-        readonly SqliteConnection _connection = Context.CreateConnection();
+        private readonly SqliteConnection _connection = Context.CreateConnection();
 #else
-        readonly DbConnection _connection = Context.CreateConnection();
+        private readonly DbConnection _connection = Context.CreateConnection();
 #endif
 
         [Benchmark(Baseline = true)]
@@ -45,7 +45,7 @@ namespace EntityFramework.CommonTools.Benchmarks
             }
         }
 
-        readonly Random _random = new Random();
+        private readonly Random _random = new Random();
 
         [Benchmark]
         public object NotCachedQuery()

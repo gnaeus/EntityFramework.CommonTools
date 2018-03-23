@@ -39,28 +39,22 @@ namespace EntityFramework.CommonTools
             {
                 object entity = dbEntry.Entity;
 
-                var concurrencyCheckableTimestamp = entity as IConcurrencyCheckable<byte[]>;
-                if (concurrencyCheckableTimestamp != null)
+                if (entity is IConcurrencyCheckable<byte[]> concurrencyCheckableTimestamp)
                 {
                     // take row version from entity that modified by client
                     dbEntry.OriginalValues[ROW_VERSION] = concurrencyCheckableTimestamp.RowVersion;
-                    continue;
                 }
-                var concurrencyCheckableLong = entity as IConcurrencyCheckable<long>;
-                if (concurrencyCheckableLong != null)
+                else if (entity is IConcurrencyCheckable<long> concurrencyCheckableLong)
                 {
                     // take row version from entity that modified by client
                     dbEntry.OriginalValues[ROW_VERSION] = concurrencyCheckableLong.RowVersion;
-                    continue;
                 }
-                var concurrencyCheckableGuid = entity as IConcurrencyCheckable<Guid>;
-                if (concurrencyCheckableGuid != null)
+                else if (entity is IConcurrencyCheckable<Guid> concurrencyCheckableGuid)
                 {
                     // take row version from entity that modified by client
                     dbEntry.OriginalValues[ROW_VERSION] = concurrencyCheckableGuid.RowVersion;
                     // generate new row version
                     concurrencyCheckableGuid.RowVersion = Guid.NewGuid();
-                    continue;
                 }
             }
 #if !EF_CORE
@@ -93,7 +87,7 @@ namespace EntityFramework.CommonTools
                     {
                         throw;
                     }
-                    // update original values from the database 
+                    // update original values from the database
                     EntityEntry dbEntry = ex.Entries.Single();
                     dbEntry.OriginalValues.SetValues(dbEntry.GetDatabaseValues());
 
@@ -124,7 +118,7 @@ namespace EntityFramework.CommonTools
                     {
                         throw;
                     }
-                    // update original values from the database 
+                    // update original values from the database
                     EntityEntry dbEntry = ex.Entries.Single();
                     dbEntry.OriginalValues.SetValues(await dbEntry.GetDatabaseValuesAsync());
 
@@ -137,23 +131,17 @@ namespace EntityFramework.CommonTools
         {
             object entity = dbEntry.Entity;
 
-            var concurrencyCheckableTimestamp = entity as IConcurrencyCheckable<byte[]>;
-            if (concurrencyCheckableTimestamp != null)
+            if (entity is IConcurrencyCheckable<byte[]> concurrencyCheckableTimestamp)
             {
                 concurrencyCheckableTimestamp.RowVersion = (byte[])dbEntry.OriginalValues[ROW_VERSION];
-                return;
             }
-            var concurrencyCheckableLong = entity as IConcurrencyCheckable<long>;
-            if (concurrencyCheckableLong != null)
+            else if (entity is IConcurrencyCheckable<long> concurrencyCheckableLong)
             {
                 concurrencyCheckableLong.RowVersion = (long)dbEntry.OriginalValues[ROW_VERSION];
-                return;
             }
-            var concurrencyCheckableGuid = entity as IConcurrencyCheckable<Guid>;
-            if (concurrencyCheckableGuid != null)
+            else if (entity is IConcurrencyCheckable<Guid> concurrencyCheckableGuid)
             {
                 concurrencyCheckableGuid.RowVersion = (Guid)dbEntry.OriginalValues[ROW_VERSION];
-                return;
             }
         }
     }

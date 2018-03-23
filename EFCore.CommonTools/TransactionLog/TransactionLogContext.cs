@@ -23,13 +23,13 @@ namespace EntityFramework.CommonTools
     /// </summary>
     internal class TransactionLogContext
     {
-        readonly DbContext _context;
-        readonly Guid _transactionId = Guid.NewGuid();
-        readonly DateTime _createdUtc = DateTime.UtcNow;
+        private readonly DbContext _context;
+        private readonly Guid _transactionId = Guid.NewGuid();
+        private readonly DateTime _createdUtc = DateTime.UtcNow;
 
-        readonly List<EntityEntry> _insertedEntries = new List<EntityEntry>();
-        readonly List<EntityEntry> _updatedEntries = new List<EntityEntry>();
-        readonly List<TransactionLog> _deletedLogs = new List<TransactionLog>();
+        private readonly List<EntityEntry> _insertedEntries = new List<EntityEntry>();
+        private readonly List<EntityEntry> _updatedEntries = new List<EntityEntry>();
+        private readonly List<TransactionLog> _deletedLogs = new List<TransactionLog>();
         
         public TransactionLogContext(DbContext context)
         {

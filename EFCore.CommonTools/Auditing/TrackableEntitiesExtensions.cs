@@ -32,7 +32,7 @@ namespace EntityFramework.CommonTools
                 UpdateTrackableEntity(dbEntry, utcNow);
             }
         }
-        
+
         private static void UpdateTrackableEntity(EntityEntry dbEntry, DateTime utcNow)
         {
             object entity = dbEntry.Entity;
@@ -40,16 +40,14 @@ namespace EntityFramework.CommonTools
             switch (dbEntry.State)
             {
                 case EntityState.Added:
-                    var creationTrackable = entity as ICreationTrackable;
-                    if (creationTrackable != null)
+                    if (entity is ICreationTrackable creationTrackable)
                     {
                         creationTrackable.CreatedUtc = utcNow;
                     }
                     break;
 
                 case EntityState.Modified:
-                    var modificatonTrackable = entity as IModificationTrackable;
-                    if (modificatonTrackable != null)
+                    if (entity is IModificationTrackable modificatonTrackable)
                     {
                         modificatonTrackable.UpdatedUtc = utcNow;
                         dbEntry.CurrentValues[nameof(IModificationTrackable.UpdatedUtc)] = utcNow;
@@ -57,16 +55,13 @@ namespace EntityFramework.CommonTools
                     break;
 
                 case EntityState.Deleted:
-                    var softDeletable = entity as ISoftDeletable;
-                    if (softDeletable != null)
+                    if (entity is ISoftDeletable softDeletable)
                     {
                         dbEntry.State = EntityState.Unchanged;
-
                         softDeletable.IsDeleted = true;
                         dbEntry.CurrentValues[nameof(ISoftDeletable.IsDeleted)] = true;
 
-                        var deletionTrackable = entity as IDeletionTrackable;
-                        if (deletionTrackable != null)
+                        if (entity is IDeletionTrackable deletionTrackable)
                         {
                             deletionTrackable.DeletedUtc = utcNow;
                             dbEntry.CurrentValues[nameof(IDeletionTrackable.DeletedUtc)] = utcNow;

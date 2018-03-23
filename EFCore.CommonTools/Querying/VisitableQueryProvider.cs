@@ -30,7 +30,7 @@ namespace System.Linq.CommonTools
         , IDbAsyncQueryProvider
 #endif
     {
-        readonly VisitableQuery<T> _query;
+        private readonly VisitableQuery<T> _query;
 
         public VisitableQueryProvider(VisitableQuery<T> query)
         {
@@ -69,7 +69,7 @@ namespace System.Linq.CommonTools
         public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
         {
             expression = _query.Visitors.Visit(expression);
-            var asyncProvider = _query.InnerQuery.Provider as IAsyncQueryProvider;
+            var asyncProvider = (IAsyncQueryProvider)_query.InnerQuery.Provider;
             return asyncProvider.ExecuteAsync<TResult>(expression);
         }
 

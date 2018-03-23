@@ -14,9 +14,9 @@ namespace System.Linq.CommonTools
 {
     internal class ExtensionRebinder : ExpressionVisitor
     {
-        readonly object _originalQueryable;
-        readonly Expression _replacementQueryable;
-        readonly List<KeyValuePair<string, Expression>> _argumentReplacements;
+        private readonly object _originalQueryable;
+        private readonly Expression _replacementQueryable;
+        private readonly List<KeyValuePair<string, Expression>> _argumentReplacements;
 
         public ExtensionRebinder(
             object originalQueryable, Expression replacementQueryable,

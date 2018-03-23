@@ -21,7 +21,7 @@ namespace System.Linq.CommonTools
     /// </summary>
     public class AsQueryableExpander : ExpressionVisitor
     {
-        readonly ExpressionVisitor _expressionExpander = new AsQueryableExpressionExpander();
+        private readonly ExpressionVisitor _expressionExpander = new AsQueryableExpressionExpander();
         
         protected override Expression VisitUnary(UnaryExpression node)
         {

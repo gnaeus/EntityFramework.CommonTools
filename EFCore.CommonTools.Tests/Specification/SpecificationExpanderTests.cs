@@ -54,7 +54,7 @@ namespace EntityFramework.CommonTools.Tests
 
         public class PostByTitleSpec : ISpecification<Post>
         {
-            readonly string _title;
+            private readonly string _title;
 
             public PostByTitleSpec(string title)
             {

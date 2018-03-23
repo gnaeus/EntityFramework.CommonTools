@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EntityFrameworkCore.CommonTools
 #elif EF_6
-
 using System.Data.Entity;
 using EntityEntry = System.Data.Entity.Infrastructure.DbEntityEntry;
 
@@ -62,32 +61,26 @@ namespace EntityFramework.CommonTools
             switch (dbEntry.State)
             {
                 case EntityState.Added:
-                    var creationAuditable = entity as ICreationAuditable<TUserId>;
-                    if (creationAuditable != null)
+                    if (entity is ICreationAuditable<TUserId> creationAuditable)
                     {
                         UpdateTrackableEntity(dbEntry, utcNow);
-
                         creationAuditable.CreatorUserId = editorUserId;
                     }
                     break;
 
                 case EntityState.Modified:
-                    var modificationAuditable = entity as IModificationAuditable<TUserId>;
-                    if (modificationAuditable != null)
+                    if (entity is IModificationAuditable<TUserId> modificationAuditable)
                     {
                         UpdateTrackableEntity(dbEntry, utcNow);
-
                         modificationAuditable.UpdaterUserId = editorUserId;
                         dbEntry.CurrentValues[nameof(IModificationAuditable<TUserId>.UpdaterUserId)] = editorUserId;
                     }
                     break;
 
                 case EntityState.Deleted:
-                    var deletionAuditable = entity as IDeletionAuditable<TUserId>;
-                    if (deletionAuditable != null)
+                    if (entity is IDeletionAuditable<TUserId> deletionAuditable)
                     {
                         UpdateTrackableEntity(dbEntry, utcNow);
-
                         // change CurrentValues after dbEntry.State becomes EntityState.Unchanged
                         deletionAuditable.DeleterUserId = editorUserId;
                         dbEntry.CurrentValues[nameof(IDeletionAuditable<TUserId>.DeleterUserId)] = editorUserId;

@@ -36,9 +36,9 @@ namespace System.Linq.CommonTools
         , IDbAsyncEnumerable<T>
 #endif
     {
-        readonly ExpressionVisitor[] _visitors;
-        readonly IQueryable<T> _queryable;
-        readonly VisitableQueryProvider<T> _provider;
+        private readonly ExpressionVisitor[] _visitors;
+        private readonly IQueryable<T> _queryable;
+        private readonly VisitableQueryProvider<T> _provider;
 
         internal ExpressionVisitor[] Visitors => _visitors;
         internal IQueryable<T> InnerQuery => _queryable;

@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 #if EF_CORE
 namespace EntityFrameworkCore.CommonTools.Tests
 #elif EF_6
-
 namespace EntityFramework.CommonTools.Tests
 #endif
 {

@@ -29,8 +29,8 @@ namespace EntityFramework.CommonTools
 
         private struct AutoDetectChangesContext : IDisposable
         {
-            readonly DbContextConfiguration _configuration;
-            readonly bool _autoDetectChangesEnabled;
+            private readonly DbContextConfiguration _configuration;
+            private readonly bool _autoDetectChangesEnabled;
 
             public AutoDetectChangesContext(DbContextConfiguration configuration)
             {
