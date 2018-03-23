@@ -11,7 +11,7 @@
     <licenseUrl>https://github.com/gnaeus/EntityFramework.CommonTools/blob/master/LICENSE</licenseUrl>
     <iconUrl>https://raw.githubusercontent.com/gnaeus/EntityFramework.CommonTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>EntityFramework v6.2; Improve AuditableEntities API</releaseNotes>
+    <releaseNotes>EntityFramework 6.2; Improve AuditableEntities API</releaseNotes>
     <copyright>Copyright © Dmitry Panyushkin 2017</copyright>
     <tags>EF EntityFramework Entity Framework ChangeTracking Change Tracking Auditing Audit TransactionLog Transaction Log ComplexType Complex Type JSON</tags>
     <dependencies>

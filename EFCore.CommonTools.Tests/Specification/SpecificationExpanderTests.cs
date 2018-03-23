@@ -39,16 +39,17 @@ namespace EntityFramework.CommonTools.Tests
 
                 var query = context.Users
                     .AsVisitable(new SpecificationExpander())
-                    .Select(u => u.Posts.Where(postSpec));
+                    .Select(u => u.Posts.Where(postSpec).ToList());
 
                 var expected = context.Users
-                    .Select(u => u.Posts.Where(p => !p.IsDeleted));
+                    .Select(u => u.Posts.Where(p => !p.IsDeleted).ToList());
 
                 Assert.AreEqual(expected.ToString(), query.ToString());
 
                 Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
-                Assert.IsNotNull(query.Single());
+                // assert that we find one user with one post
+                query.Single().Single();
             }
         }
 
@@ -146,16 +147,23 @@ namespace EntityFramework.CommonTools.Tests
 
                 var query = context.Users
                     .AsVisitable(new SpecificationExpander())
-                    .Select(u => u.Posts.Where(new PostByContentSpec(content) || new PostByContentSpec(content)));
+                    .Select(u => u.Posts
+                        .Where(new PostByContentSpec(content)
+                            || new PostByContentSpec(content))
+                        .ToList());
 
                 var expected = context.Users
-                    .Select(u => u.Posts.Where(p => p.Content.Contains(content) || p.Content.Contains(content)));
+                    .Select(u => u.Posts
+                        .Where(p => p.Content.Contains(content)
+                            || p.Content.Contains(content))
+                        .ToList());
 
                 Assert.AreEqual(expected.ToString(), query.ToString());
 
                 Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
-                Assert.IsNotNull(query.Single());
+                // assert that we find one user with one post
+                query.Single().Single();
             }
         }
         

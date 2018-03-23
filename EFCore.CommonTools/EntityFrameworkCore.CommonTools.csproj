@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/gnaeus/EntityFramework.CommonTools.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>EFCore v2; Improve AuditableEntities API</PackageReleaseNotes>
+    <PackageReleaseNotes>EFCore 2.0; Improve AuditableEntities API</PackageReleaseNotes>
     <Copyright>Copyright © Dmitry Panyushkin 2017</Copyright>
     <PackageTags>EF EFCore EntityFrameworkCore EntityFramework Entity Framework ChangeTracking Change Tracking Auditing Audit TransactionLog Transaction Log ComplexType Complex Type JSON</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

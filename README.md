@@ -818,8 +818,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.0.0] - 2018-03-23
 ### Added
-- EFCore v2 support
-- EntityFramework v6.2 support
+- EFCore 2.0 support
+- EntityFramework 6.2 support
 
 ### Changed
 - `ICreationAuditable.CreatorUser` renamed to `CreatorUserId`
