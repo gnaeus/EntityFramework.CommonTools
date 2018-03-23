@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <PackageId>EntityFrameworkCore.CommonTools</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Description>An extension for EntityFrameworkCore that provides Auditing, Concurrency Checks, JSON Complex Types and writing history to Transaction Log.</Description>
     <Authors>Dmitry Panyushkin</Authors>
     <Company />
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/gnaeus/EntityFramework.CommonTools.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <PackageReleaseNotes>EFCore v2; Improve AuditableEntities API</PackageReleaseNotes>
     <Copyright>Copyright © Dmitry Panyushkin 2017</Copyright>
     <PackageTags>EF EFCore EntityFrameworkCore EntityFramework Entity Framework ChangeTracking Change Tracking Auditing Audit TransactionLog Transaction Log ComplexType Complex Type JSON</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jil" Version="2.15.1" />
+    <PackageReference Include="Jil" Version="2.15.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.2" />
   </ItemGroup>

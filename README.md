@@ -359,7 +359,7 @@ interface ICreationAuditable<TUserId> : ICreationTrackable
 // or
 interface ICreationAuditable : ICreationTrackable
 {
-    string CreatorUser { get; set; }
+    string CreatorUserId { get; set; }
 }
 ```
 
@@ -388,7 +388,7 @@ interface IModificationAuditable<TUserId> : IModificationTrackable
 // or
 interface IModificationAuditable : IModificationTrackable
 {
-    string UpdaterUser { get; set; }
+    string UpdaterUserId { get; set; }
 }
 ```
 
@@ -415,7 +415,7 @@ public interface IDeletionAuditable<TUserId> : IDeletionTrackable
 // or
 public interface IDeletionAuditable : IDeletionTrackable
 {
-    string DeleterUser { get; set; }
+    string DeleterUserId { get; set; }
 }
 ```
 
@@ -445,7 +445,7 @@ You can choose between saving the user `Id` or the user `Login`.
 So there are two overloadings for `DbContext.UpdateAudiatbleEntities()`:
 ```cs
 static void UpdateAuditableEntities<TUserId>(this DbContext context, TUserId editorUserId);
-static void UpdateAuditableEntities(this DbContext context, string editorUser);
+static void UpdateAuditableEntities(this DbContext context, string editorUserId);
 ```
 and also the separate extension to update only `Trackable` entities:
 ```cs

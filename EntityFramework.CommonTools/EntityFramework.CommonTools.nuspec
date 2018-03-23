@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>EntityFramework.CommonTools</id>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <summary>Auditing, Concurrency Checks, JSON properties and Transaction Logs for EntityFramework</summary>
     <description>An extension for EntityFramework that provides Auditing, Concurrency Checks, storing complex types as JSON and storing history of all changes from DbContext to Transaction Log.</description>
     <authors>Dmitry Panyushkin</authors>
@@ -11,12 +11,12 @@
     <licenseUrl>https://github.com/gnaeus/EntityFramework.CommonTools/blob/master/LICENSE</licenseUrl>
     <iconUrl>https://raw.githubusercontent.com/gnaeus/EntityFramework.CommonTools/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>First release</releaseNotes>
+    <releaseNotes>EntityFramework v6.2; Improve AuditableEntities API</releaseNotes>
     <copyright>Copyright © Dmitry Panyushkin 2017</copyright>
     <tags>EF EntityFramework Entity Framework ChangeTracking Change Tracking Auditing Audit TransactionLog Transaction Log ComplexType Complex Type JSON</tags>
     <dependencies>
       <dependency id="Jil" version="2.15" />
-      <dependency id="EntityFramework" version="6.1" />
+      <dependency id="EntityFramework" version="6.2" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Data"  />
