@@ -61,11 +61,11 @@ namespace EntityFramework.CommonTools.Tests
             }
         }
 
-        public Task<int> SaveChangesAsync(string editorUser)
+        public Task<int> SaveChangesAsync(string editorUserId)
         {
             using (this.WithChangeTrackingOnce())
             {
-                this.UpdateAuditableEntities(editorUser);
+                this.UpdateAuditableEntities(editorUserId);
                 this.UpdateTrackableEntities();
                 this.UpdateConcurrentEntities();
 

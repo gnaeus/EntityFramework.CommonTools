@@ -1,6 +1,10 @@
-﻿#if EF_CORE
+﻿using System;
+
+#if EF_CORE
+
 namespace EntityFrameworkCore.CommonTools
 #elif EF_6
+
 namespace EntityFramework.CommonTools
 #endif
 {
@@ -22,9 +26,15 @@ namespace EntityFramework.CommonTools
     /// </summary>
     public interface ICreationAuditable : ICreationTrackable
     {
+        string CreatorUserId { get; set; }
+    }
+
+    [Obsolete("Use ICreationAuditable instead")]
+    public interface ICreationAuditableV1 : ICreationTrackable
+    {
         string CreatorUser { get; set; }
     }
-    
+
     /// <summary>
     /// This interface is implemented by entities that is wanted
     /// to store modification information (who and when modified lastly).
@@ -43,9 +53,15 @@ namespace EntityFramework.CommonTools
     /// </summary>
     public interface IModificationAuditable : IModificationTrackable
     {
+        string UpdaterUserId { get; set; }
+    }
+
+    [Obsolete("Use IModificationAuditable instead")]
+    public interface IModificationAuditableV1 : IModificationTrackable
+    {
         string UpdaterUser { get; set; }
     }
-    
+
     /// <summary>
     /// This interface is implemented by entities which wanted
     /// to store deletion information (who and when deleted).
@@ -62,9 +78,15 @@ namespace EntityFramework.CommonTools
     /// </summary>
     public interface IDeletionAuditable : IDeletionTrackable
     {
+        string DeleterUserId { get; set; }
+    }
+
+    [Obsolete("Use IDeletionAuditable instead")]
+    public interface IDeletionAuditableV1 : IDeletionTrackable
+    {
         string DeleterUser { get; set; }
     }
-    
+
     /// <summary>
     /// This interface is implemented by entities which must be audited.
     /// Related properties automatically set when saving/updating/deleting Entity objects.
@@ -81,6 +103,12 @@ namespace EntityFramework.CommonTools
     /// </summary>
     public interface IFullAuditable : IFullTrackable,
         ICreationAuditable, IModificationAuditable, IDeletionAuditable
+    {
+    }
+
+    [Obsolete("Use IFullAuditable instead")]
+    public interface IFullAuditableV1 : IFullTrackable,
+        ICreationAuditableV1, IModificationAuditableV1, IDeletionAuditableV1
     {
     }
 }

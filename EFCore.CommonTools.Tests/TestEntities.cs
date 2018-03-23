@@ -40,7 +40,7 @@ namespace EntityFrameworkCore.CommonTools.Tests
         public string Title { get; set; }
         public string Content { get; set; }
 
-        JsonField<ICollection<string>> _tags = new HashSet<string>();
+        private JsonField<ICollection<string>> _tags = new HashSet<string>();
 
         public bool ShouldSerializeTagsJson() => false;
 
@@ -78,7 +78,7 @@ namespace EntityFrameworkCore.CommonTools.Tests
         [Key]
         public string Key { get; set; }
 
-        JsonField<dynamic> _value;
+        private JsonField<dynamic> _value;
 
         [Column("Value"), IgnoreDataMember]
         public string ValueJson
@@ -95,11 +95,11 @@ namespace EntityFrameworkCore.CommonTools.Tests
         }
 
         public bool IsDeleted { get; set; }
-        public string CreatorUser { get; set; }
+        public string CreatorUserId { get; set; }
         public DateTime CreatedUtc { get; set; }
-        public string UpdaterUser { get; set; }
+        public string UpdaterUserId { get; set; }
         public DateTime? UpdatedUtc { get; set; }
-        public string DeleterUser { get; set; }
+        public string DeleterUserId { get; set; }
         public DateTime? DeletedUtc { get; set; }
 
         [ConcurrencyCheck]

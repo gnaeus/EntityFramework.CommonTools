@@ -12,9 +12,9 @@ namespace EntityFrameworkCore.CommonTools.Tests
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Settings> Settings { get; set; }
-        
+
         public DbSet<TransactionLog> TransactionLogs { get; set; }
-        
+
         public TestDbContext(string databaseName)
             : base(new DbContextOptionsBuilder<TestDbContext>()
                   .UseInMemoryDatabase(databaseName)
@@ -84,9 +84,9 @@ namespace EntityFrameworkCore.CommonTools.Tests
             return SaveChanges();
         }
 
-        public Task<int> SaveChangesAsync(string editorUser)
+        public Task<int> SaveChangesAsync(string editorUserId)
         {
-            this.UpdateAuditableEntities(editorUser);
+            this.UpdateAuditableEntities(editorUserId);
 
             return SaveChangesAsync();
         }

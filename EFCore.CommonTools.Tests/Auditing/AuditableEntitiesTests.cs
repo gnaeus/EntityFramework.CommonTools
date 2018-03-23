@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 #if EF_CORE
 namespace EntityFrameworkCore.CommonTools.Tests
 #elif EF_6
+
 namespace EntityFramework.CommonTools.Tests
 #endif
 {
@@ -65,7 +66,7 @@ namespace EntityFramework.CommonTools.Tests
 
                 context.Entry(settings).Reload();
                 Assert.AreEqual(DateTime.UtcNow.Date, settings.CreatedUtc.ToUniversalTime().Date);
-                Assert.AreEqual("admin", settings.CreatorUser);
+                Assert.AreEqual("admin", settings.CreatorUserId);
 
                 // update
                 settings.Value = "second";
@@ -75,7 +76,7 @@ namespace EntityFramework.CommonTools.Tests
                 context.Entry(settings).Reload();
                 Assert.IsNotNull(settings.UpdatedUtc);
                 Assert.AreEqual(DateTime.UtcNow.Date, settings.UpdatedUtc?.ToUniversalTime().Date);
-                Assert.AreEqual("admin", settings.UpdaterUser);
+                Assert.AreEqual("admin", settings.UpdaterUserId);
 
                 // delete
                 context.Settings.Remove(settings);
@@ -86,7 +87,7 @@ namespace EntityFramework.CommonTools.Tests
                 Assert.AreEqual(true, settings.IsDeleted);
                 Assert.IsNotNull(settings.DeletedUtc);
                 Assert.AreEqual(DateTime.UtcNow.Date, settings.DeletedUtc?.ToUniversalTime().Date);
-                Assert.AreEqual("admin", settings.DeleterUser);
+                Assert.AreEqual("admin", settings.DeleterUserId);
             }
         }
     }

@@ -70,11 +70,11 @@ namespace EntityFramework.CommonTools.Tests
 
                     IsDeleted BOOLEAN,
                     CreatedUtc DATETIME,
-                    CreatorUser TEXT,
+                    CreatorUserId TEXT,
                     UpdatedUtc DATETIME,
-                    UpdaterUser TEXT,
+                    UpdaterUserId TEXT,
                     DeletedUtc DATETIME,
-                    DeleterUser TEXT,
+                    DeleterUserId TEXT,
 
                     RowVersion INTEGER DEFAULT 0
                 );

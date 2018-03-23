@@ -93,11 +93,11 @@ namespace EntityFramework.CommonTools.Tests
         }
         
         public bool IsDeleted { get; set; }
-        public string CreatorUser { get; set; }
+        public string CreatorUserId { get; set; }
         public DateTime CreatedUtc { get; set; }
-        public string UpdaterUser { get; set; }
+        public string UpdaterUserId { get; set; }
         public DateTime? UpdatedUtc { get; set; }
-        public string DeleterUser { get; set; }
+        public string DeleterUserId { get; set; }
         public DateTime? DeletedUtc { get; set; }
 
         [ConcurrencyCheck]
