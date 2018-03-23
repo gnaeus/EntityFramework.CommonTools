@@ -16,7 +16,7 @@ Extension for EntityFramework and EntityFramework Core that provides: Expandable
  * [DbContext Extensions (EF 6 only)](#ef-6-only)
  * [Usage with EntityFramework Core](#ef-core-usage)
  * [Usage with EntityFramework 6](#ef-6-usage)
- * [ChangeLog](#changelog)
+ * [Changelog](#changelog)
 
 ### NuGet
 ```
@@ -808,13 +808,11 @@ class MyDbContext : DbContext
 
 <hr>
 
-# <a name="changelog"></a> ChangeLog
+# <a name="changelog"></a> Changelog
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
-
-## [Unreleased]
 
 ## [2.0.0] - 2018-03-23
 ### Added
@@ -825,7 +823,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `ICreationAuditable.CreatorUser` renamed to `CreatorUserId`
 - `IModificationAuditable.UpdaterUser` renamed to `UpdaterUserId`
 - `IDeletionAuditable.DeleterUser` renamed to `DeleterUserId`
-See #1.
+
+See [#1](https://github.com/gnaeus/EntityFramework.CommonTools/issues/1).
 
 For compatibility issues you still can use these interfaces:
 ```cs
@@ -854,6 +853,5 @@ public interface IFullAuditableV1 : IFullTrackable,
 ### Added
 Initial project version.
 
-[Unreleased]: https://github.com/gnaeus/EntityFramework.CommonTools/compare/2.0.0...HEAD
 [2.0.0]: https://github.com/gnaeus/EntityFramework.CommonTools/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/gnaeus/EntityFramework.CommonTools/tree/1.0.0
