@@ -136,7 +136,7 @@ namespace EntityFramework.CommonTools.Tests
                         .Where(p => p.CreatedUtc > today)
                         .Take(5)
                         .Count());
-                
+
                 Assert.AreEqual(expected.ToString(), query.ToString());
 
                 Assert.AreNotSame(expected.Expression, query.Expression);
@@ -176,7 +176,41 @@ namespace EntityFramework.CommonTools.Tests
                 Assert.IsNull(query.FirstOrDefault());
             }
         }
-        
+
+        [TestMethod]
+        public void ShouldExpandBoundLambdas()
+        {
+            using (var context = CreateSqliteDbContext())
+            {
+                var user = new User();
+                context.Users.Add(user);
+
+                var post = new Post { Title = "first", Author = user };
+                context.Posts.Add(post);
+
+                context.SaveChanges();
+
+                var query = context.Users.AsExpandable()
+                    .SelectMany(u => context.Posts
+                        .Filter(p => p.CreatorUserId == u.Id && !p.IsDeleted));
+
+                var expected = context.Users.AsExpandable()
+                    .SelectMany(u => context.Posts
+                        .Where(p => p.CreatorUserId == u.Id && !p.IsDeleted));
+
+                Assert.AreEqual(expected.ToString(), query.ToString());
+
+                Assert.AreNotSame(expected.Expression, query.Expression);
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
+
+                var queryPosts = query.ToList();
+                var expectedPosts = expected.ToList();
+
+                Assert.That.SequenceEqual(expectedPosts.Select(p => p.Id), queryPosts.Select(p => p.Id));
+            }
+        }
+
         [TestMethod]
         public void ShouldExpandNestedExtensions()
         {

@@ -814,6 +814,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.1] - 2018-03-27
+### Fixed
+- `.AsExpandable()` works with bound lambda arguments
+
 ## [2.0.0] - 2018-03-23
 ### Added
 - EFCore 2.0 support
@@ -849,9 +853,10 @@ public interface IFullAuditableV1 : IFullTrackable,
 }
 ```
 
-## [1.0.0] - 2017-07-20
+## [1.0.0] - 2017-08-16
 ### Added
 Initial project version.
 
+[2.0.1]: https://github.com/gnaeus/EntityFramework.CommonTools/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/gnaeus/EntityFramework.CommonTools/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/gnaeus/EntityFramework.CommonTools/tree/1.0.0

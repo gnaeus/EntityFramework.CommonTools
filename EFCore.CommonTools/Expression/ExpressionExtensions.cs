@@ -82,6 +82,15 @@ namespace System.Linq.CommonTools
                         }
                     }
                     break;
+
+                case ExpressionType.Quote:
+                    var quoteExpression = (UnaryExpression)expression;
+                    {
+                        return GetValue(quoteExpression.Operand);
+                    }
+
+                case ExpressionType.Lambda:
+                    return expression;
             }
 
             // we can't interpret the expression but we can compile and run it

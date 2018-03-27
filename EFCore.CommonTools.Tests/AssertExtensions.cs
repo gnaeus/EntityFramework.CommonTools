@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -45,6 +46,15 @@ namespace EntityFramework.CommonTools.Tests
                     Assert.AreEqual(expectedCall.Method, actualCall.Method);
                 }
             }
+        }
+
+        public static void SequenceEqual<T>(this Assert assert, IEnumerable<T> expexted, IEnumerable<T> actual)
+        {
+            expexted = expexted.ToList();
+            actual = actual.ToList();
+
+            Assert.AreEqual(expexted.Count(), actual.Count());
+            Assert.IsTrue(expexted.SequenceEqual(actual));
         }
     }
 }
