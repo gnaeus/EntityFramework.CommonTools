@@ -1,4 +1,4 @@
-version: 1.0.0.{build}
+version: 2.0.0.{build}
 
 image: Visual Studio 2017
 
@@ -6,8 +6,14 @@ before_build:
   - nuget restore
 
 test_script:
-  - dotnet test --no-build .\EFCore.CommonTools.Tests\EntityFrameworkCore.CommonTools.Tests.csproj
+  - dotnet test --no-build .\EFCore.CommonTools.Tests\EntityFrameworkCore.CommonTools.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
   - dotnet test --no-build .\EntityFramework.CommonTools.Tests\EntityFramework.CommonTools.Tests.csproj
+
+after_test:
+  - ps: |
+      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+      bash codecov.sh -f ".\EFCore.CommonTools.Tests\coverage.xml" -t 5a158edf-3f15-40d8-92d7-3b3dc67d079b
 
 cache:
   - '%USERPROFILE%\.nuget\packages'
