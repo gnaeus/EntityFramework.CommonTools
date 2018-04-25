@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #if EF_CORE
+using Microsoft.EntityFrameworkCore;
+
 namespace EntityFrameworkCore.CommonTools.Tests
 #elif EF_6
 using System.Data.Entity;
@@ -237,6 +241,102 @@ namespace EntityFramework.CommonTools.Tests
             Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
 
             Assert.IsNull(query.FirstOrDefault());
+        }
+
+        [TestMethod]
+        public void ShouldWorkWithInclude()
+        {
+            using (var context = CreateSqliteDbContext())
+            {
+                var user = new User();
+                context.Users.Add(user);
+
+                var post = new Post { Title = "first", Author = user };
+                context.Posts.Add(post);
+
+                context.SaveChanges();
+
+                var query = context.Users.AsExpandable()
+                    .SelectMany(u => u.Posts.FilterIsActive())
+                    .Include(p => p.Author);
+
+                var expected = context.Users.AsExpandable()
+                    .SelectMany(u => u.Posts.Where(p => !p.IsDeleted))
+                    .Include(p => p.Author);
+
+                Assert.AreEqual(expected.ToString(), query.ToString());
+
+                Assert.AreNotSame(expected.Expression, query.Expression);
+
+                Assert.That.MethodCallsAreMatch(expected.Expression, query.Expression);
+
+                var queryPosts = query.ToList();
+                var expectedPosts = expected.ToList();
+
+                Assert.That.SequenceEqual(expectedPosts.Select(p => p.Id), queryPosts.Select(p => p.Id));
+                Assert.That.SequenceEqual(expectedPosts.Select(p => p.Author.Id), queryPosts.Select(p => p.Author.Id));
+            }
+        }
+
+        [TestMethod]
+        public void ShouldWorkAsNonGeneric()
+        {
+            using (var context = CreateSqliteDbContext())
+            {
+                var user = new User();
+                context.Users.Add(user);
+
+                var post = new Post { Title = "first", Author = user };
+                context.Posts.Add(post);
+
+                context.SaveChanges();
+
+                var query = context.Users.AsExpandable()
+                    .SelectMany(u => u.Posts.FilterIsActive());
+
+                var posts = new List<Post>();
+
+                foreach (Post p in query as IEnumerable)
+                {
+                    posts.Add(p);
+                }
+
+                Assert.AreEqual(1, posts.Count);
+                Assert.AreEqual("first", posts[0].Title);
+                Assert.AreEqual(typeof(Post), (query as IQueryable).ElementType);
+            }
+        }
+
+        [TestMethod]
+        public async Task ShouldWorkAsAsync()
+        {
+            using (var context = CreateSqliteDbContext())
+            {
+                var user = new User();
+                context.Users.Add(user);
+
+                var post = new Post { Title = "first", Author = user };
+                context.Posts.Add(post);
+
+                context.SaveChanges();
+
+                var query = context.Users.AsExpandable()
+                    .SelectMany(u => u.Posts.FilterIsActive());
+
+                var posts = await query.ToListAsync();
+
+                Assert.AreEqual(1, posts.Count);
+                Assert.AreEqual("first", posts[0].Title);
+
+                var groupQuery = query
+                    .GroupBy(p => p.CreatorUserId)
+                    .Select(g => g.ToList());
+
+                var groupPosts = await groupQuery.FirstOrDefaultAsync();
+
+                Assert.AreEqual(1, groupPosts.Count);
+                Assert.AreEqual("first", groupPosts[0].Title);
+            }
         }
     }
 }
