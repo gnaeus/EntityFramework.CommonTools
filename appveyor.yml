@@ -13,7 +13,7 @@ after_test:
   - ps: |
       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-      bash codecov.sh -f ".\EFCore.CommonTools.Tests\coverage.xml" -t 5a158edf-3f15-40d8-92d7-3b3dc67d079b
+      bash codecov.sh -f "EFCore.CommonTools.Tests/coverage.xml" -t 5a158edf-3f15-40d8-92d7-3b3dc67d079b
 
 cache:
   - '%USERPROFILE%\.nuget\packages'
