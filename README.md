@@ -661,6 +661,8 @@ class TransactionLog
 }
 ```
 
+For querying and indexing TransactionLogs table see [#2](https://github.com/gnaeus/EntityFramework.CommonTools/issues/2).
+
 <br>
 
 ## <a name="ef-6-only"></a> DbContext Extensions (EF 6 only)
