@@ -51,6 +51,11 @@ namespace EntityFramework.CommonTools
                     {
                         modificatonTrackable.UpdatedUtc = utcNow;
                         dbEntry.CurrentValues[nameof(IModificationTrackable.UpdatedUtc)] = utcNow;
+
+                        if (entity is ICreationTrackable)
+                        {
+                            PreventPropertyOverwrite<DateTime>(dbEntry, nameof(ICreationTrackable.CreatedUtc));
+                        }
                     }
                     break;
 
@@ -71,6 +76,22 @@ namespace EntityFramework.CommonTools
 
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// If we set <see cref="EntityEntry.State"/> to <see cref="EntityState.Modified"/> on entity with
+        /// empty <see cref="ICreationTrackable.CreatedUtc"/> or <see cref="ICreationAuditable.CreatorUserId"/>
+        /// we should not overwrite database values.
+        /// https://github.com/gnaeus/EntityFramework.CommonTools/issues/4
+        /// </summary>
+        private static void PreventPropertyOverwrite<TProperty>(EntityEntry dbEntry, string propertyName)
+        {
+            var propertyEntry = dbEntry.Property(propertyName);
+
+            if (propertyEntry.IsModified && Equals(dbEntry.CurrentValues[propertyName], default(TProperty)))
+            {
+                propertyEntry.IsModified = false;
             }
         }
     }

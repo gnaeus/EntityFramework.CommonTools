@@ -74,6 +74,12 @@ namespace EntityFramework.CommonTools
                         UpdateTrackableEntity(dbEntry, utcNow);
                         modificationAuditable.UpdaterUserId = editorUserId;
                         dbEntry.CurrentValues[nameof(IModificationAuditable<TUserId>.UpdaterUserId)] = editorUserId;
+
+                        if (entity is ICreationAuditable<TUserId>)
+                        {
+                            PreventPropertyOverwrite<TUserId>(
+                                dbEntry, nameof(ICreationAuditable<TUserId>.CreatorUserId));
+                        }
                     }
                     break;
 
@@ -118,12 +124,22 @@ namespace EntityFramework.CommonTools
                         UpdateTrackableEntity(dbEntry, utcNow);
                         modificationAuditable.UpdaterUserId = editorUserId;
                         dbEntry.CurrentValues[nameof(IModificationAuditable.UpdaterUserId)] = editorUserId;
+
+                        if (entity is ICreationAuditable)
+                        {
+                            PreventPropertyOverwrite<string>(dbEntry, nameof(ICreationAuditable.CreatorUserId));
+                        }
                     }
                     else if (entity is IModificationAuditableV1 modificationAuditableV1)
                     {
                         UpdateTrackableEntity(dbEntry, utcNow);
                         modificationAuditableV1.UpdaterUser = editorUserId;
                         dbEntry.CurrentValues[nameof(IModificationAuditableV1.UpdaterUser)] = editorUserId;
+
+                        if (entity is ICreationAuditableV1)
+                        {
+                            PreventPropertyOverwrite<string>(dbEntry, nameof(ICreationAuditableV1.CreatorUser));
+                        }
                     }
                     break;
 
