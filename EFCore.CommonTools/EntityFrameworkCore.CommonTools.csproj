@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>EntityFrameworkCore.CommonTools</PackageId>
-    <PackageVersion>2.0.1</PackageVersion>
+    <PackageVersion>2.0.2</PackageVersion>
     <Description>An extension for EntityFrameworkCore that provides Auditing, Concurrency Checks, JSON Complex Types and writing history to Transaction Log.</Description>
     <Authors>Dmitry Panyushkin</Authors>
     <Company />
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/gnaeus/EntityFramework.CommonTools.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>.AsExpandable() works with bound lambda arguments</PackageReleaseNotes>
+    <PackageReleaseNotes>context.Update(entity) does not reset CreatedUtc and CreatorUserId</PackageReleaseNotes>
     <Copyright>Copyright © Dmitry Panyushkin 2017</Copyright>
     <PackageTags>EF EFCore EntityFrameworkCore EntityFramework Entity Framework ChangeTracking Change Tracking Auditing Audit TransactionLog Transaction Log ComplexType Complex Type JSON</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
