@@ -12,7 +12,7 @@ namespace System.Linq.CommonTools
 #endif
 {
     /// <summary>
-    /// Specification pattren https://en.wikipedia.org/wiki/Specification_pattern.
+    /// Specification pattern https://en.wikipedia.org/wiki/Specification_pattern.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface ISpecification<T>
@@ -23,7 +23,7 @@ namespace System.Linq.CommonTools
     }
 
     /// <summary>
-    /// Implementation of Specification pattren, that can be used with <see cref="IQueryable{T}"/> expressions.
+    /// Implementation of Specification pattern, that can be used with <see cref="IQueryable{T}"/> expressions.
     /// </summary>
     [DebuggerDisplay("{Predicate}")]
     public class Specification<T> : ISpecification<T>
@@ -68,7 +68,7 @@ namespace System.Linq.CommonTools
         /// <summary>
         /// <remarks>
         /// For user-defined conditional logical operators.
-        /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
+        /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/true-false-operators
         /// </remarks>
         /// </summary>
         public static bool operator true(Specification<T> spec)
@@ -80,7 +80,7 @@ namespace System.Linq.CommonTools
         /// <summary>
         /// <remarks>
         /// For user-defined conditional logical operators.
-        /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
+        /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/true-false-operators
         /// </remarks>
         /// </summary>
         public static bool operator false(Specification<T> spec)
