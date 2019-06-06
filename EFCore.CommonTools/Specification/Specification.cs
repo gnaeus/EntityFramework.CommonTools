@@ -64,20 +64,25 @@ namespace System.Linq.CommonTools
 
             return spec.Predicate;
         }
-        
+
+        /// <summary>
         /// <remarks>
         /// For user-defined conditional logical operators.
         /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
         /// </remarks>
+        /// </summary>
         public static bool operator true(Specification<T> spec)
         {
             return false;
         }
 
+
+        /// <summary>
         /// <remarks>
         /// For user-defined conditional logical operators.
         /// https://msdn.microsoft.com/en-us/library/aa691312(v=vs.71).aspx
         /// </remarks>
+        /// </summary>
         public static bool operator false(Specification<T> spec)
         {
             return false;
